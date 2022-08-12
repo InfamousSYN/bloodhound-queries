@@ -159,7 +159,7 @@
         "allowCollapse": true
     }]
 },{
-    "name": "AAD: [NT] All Azure AD Groups that are synchronized with On-Premise AD",
+    "name": "AAD: All Azure AD Groups that are synchronized with On-Premise AD",
     "category": "AAD",
     "queryList": [{
         "final": true,
