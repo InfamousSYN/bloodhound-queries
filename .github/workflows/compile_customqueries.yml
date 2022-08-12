@@ -1,0 +1,19 @@
+name: Compile customqueries.json
+
+on:
+  push:
+    branches: [ "main" ]
+    paths: 
+      - queries/**
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: sergeysova/jq-action@v2
+        with:
+          cmd: jq -s '.[0] * .[1] * .[2] * .[3] * .[4] * .[5] * .[6] * .[7] * .[8] * .[9]' queries/top_10.json hvt.json owned.json domain.json users.json group.json computers.json gpo.json certificates.json aad.json
