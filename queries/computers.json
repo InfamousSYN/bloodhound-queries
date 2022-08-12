@@ -1,5 +1,6 @@
 [{
     "name": "Computers: Find all Domain Controllers",
+    "category": "Computers",
     "queryList": [{
         "final": false,
         "query": "MATCH (g:Group) WHERE g.objectid ENDS WITH '-516' RETURN g.name"
