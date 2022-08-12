@@ -1,1 +1,22 @@
-[{}]
+[{
+    "name": "Computers: List all computers WITHOUT LAPS",
+    "category": "Computers",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (c:Computer {haslaps:false}) RETURN c ORDER BY c.name"
+    }]
+},{
+    "name": "Computers: List all computers WITH LAPS",
+    "category": "Computers",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (c:Computer {haslaps:true}) RETURN c ORDER BY c.name"
+    }]
+},{
+    "name": "Computers: Route all sessions to computers WITHOUT LAPS",
+    "category": "Computers",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User)<-[r:HasSession]-(c:Computer {haslaps:false}) RETURN p ORDER BY c.name"
+    }]
+}]
