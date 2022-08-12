@@ -1074,6 +1074,20 @@
     ]
   },
   {
+    "name": "Computers: Find all Domain Controllers",
+    "queryList": [
+      {
+        "final": false,
+        "query": "MATCH (g:Group) WHERE g.objectid ENDS WITH '-516' RETURN g.name"
+      },
+      {
+        "final": true,
+        "query": "MATCH p=(c:Computer)-[:MemberOf*1..]->(g:Group {name: $result})-[r1]->(:Domain) RETURN p",
+        "allowCollapse": false
+      }
+    ]
+  },
+  {
     "name": "Computers: List all computers WITHOUT LAPS",
     "category": "Computers",
     "queryList": [
@@ -1521,7 +1535,7 @@
     ]
   },
   {
-    "name": "AAD: [NT] All Azure AD Groups that are synchronized with On-Premise AD",
+    "name": "AAD: All Azure AD Groups that are synchronized with On-Premise AD",
     "category": "AAD",
     "queryList": [
       {
