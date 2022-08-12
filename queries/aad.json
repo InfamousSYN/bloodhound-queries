@@ -11,7 +11,7 @@
     "category": "AAD",
     "queryList": [{
         "final": true,
-        "query": "MATCH (azu:AZUser {enabled:true}) RETURN azu",
+        "query": "MATCH (azu:AZUser) RETURN azu",
         "allowCollapse": true
     }]
 },{
