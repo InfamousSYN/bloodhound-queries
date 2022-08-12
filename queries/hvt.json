@@ -1,4 +1,4 @@
-{
+[{
     "name": "HVT: View all",
     "category": "HVT",
     "queryList": [{
@@ -14,4 +14,4 @@
         "query": "MATCH p = allShortestPaths((o {owned: true})-[r:{}*1..]->(c:Computer)) WHERE NOT o = c RETURN p",
         "allowCollapse": true
     }]
-}
+}]
