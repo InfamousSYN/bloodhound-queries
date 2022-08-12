@@ -1,4 +1,4 @@
-{
+[{
     "name": "Top 10: Users with Most Local Admin Rights",
     "category": "Top 10",
     "queryList": [{
@@ -30,4 +30,4 @@
             "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[r:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain WITH u, count(r) as rel_count order by rel_count desc LIMIT 10 MAp=(c:Computer)-[r:HasSession]->(u) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
         "allowCollapse": false
     }]
-}
+}]
