@@ -1,1 +1,144 @@
-[{}]
+[{
+    "name": "Owned: List all users",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {owned:true}) RETURN u"
+        }]
+},{
+    "name": "Owned: List all enabled users",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {owned:true, enabled:true}) RETURN u"
+        }]
+},{
+    "name": "Owned: List all enabled users NOT 'Domain Admins'",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE NOT g.objectid ENDS WITH '-519' OR NOT g.objectid ENDS WITH '-512' RETURN u"
+        }]
+},{
+    "name": "Owned: List all enabled users ARE 'Enterprise Admins'",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE g.name STARTS WITH 'ENTERPRISE ADMIN' OR g.objectid ENDS WITH '-519' RETURN u"
+        }]
+},{
+    "name": "Owned: List all enabled users ARE 'Domain Admins'",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE g.name STARTS WITH 'DOMAIN ADMIN' OR g.objectid ENDS WITH '-512' RETURN u"
+        }]
+},{
+    "name": "Owned: List all enabled users with an email address",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {owned:true, enabled:true}) WHERE exists(u.email) RETURN u"
+        }]
+},{
+    "name": "Owned: List all enabled users that can RDP",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[r:CanRDP]->(c:Computer) RETURN p"
+    }]
+},{
+    "name": "Owned: [NT] List all computers",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (c:Computer {owned:true}) RETURN c ORDER BY c.name"
+    }]
+},{
+    "name": "Owned: List all user->MemberOf->group",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) RETURN p"
+    }]
+},{
+    "name": "Owned: List the groups of all owned users",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) RETURN g"
+    }]
+},{
+    "name": "Owned: Find all group membership routes with dangerous rights over group",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+            "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(g2:GroRETURN p ORDER BY g1.name"
+    }]
+},{
+    "name": "Owned: Route owned user where group membership has dangerous rights over user",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+            "query": "MATCH p=(u1:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(u2:UsRETURN p ORDER BY g1.name"
+    }]
+},{
+    "name": "Owned: Route from owned user to all nodes with 'Unconstrained Delegation'",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,                
+        "query": "MATCH p=(o {unconstraineddelegation: true, enabled: true})<-[r]-(u:User {owned:true, enabled:true}) RETURN p",
+        "allowCollapse": false
+    }]
+},{
+    "name": "Owned: [NT][TBC] route to AAD:AZGlobalAdmin",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (au:AZUser) MATCH p=(u:User {owned:true, enabled:true})-[r]->(au) RETURN p"
+    }]
+},{
+    "name": "Owned: Find all Owners of Azure Applications with Owners to Service Principals",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p = (n {enabled:true, owned:true})-[:AZOwns]->(azapp:AZApp)-[r]->(azsp:AZServicePrincipal) RETURN p",
+        "allowCollapse": true
+    }]
+},{
+    "name": "Owned: Find all Owners of Azure Applications with Owners to Service Principals with Dangerous Rights",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p = (n {enabled:true, owned:true})-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant) RETURN p",
+        "allowCollapse": true
+    }]
+},{
+    "name": "Owned: Find all users->groups with network shares",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true})-[:MemberOf*1..]->(g:Group) WHERE g.description contains \"\\\\\" return p"
+    }]
+},{
+    "name": "Owned: Find all Dangerous Rights from owned",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true})-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(c:Computer) RETURN p"
+    }]
+},{
+    "name": "Owned: Route all sessions to computers WITHOUT LAPS",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true})<-[r:HasSession]-(c:Computer {haslaps:false}) RETURN p ORDER BY c.name"
+    }]
+},{
+    "name": "Owned: Route all sessions to computers",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true})<-[r:HasSession]-(c:Computer) RETURN p ORDER BY c.name"
+    }]
+}]
