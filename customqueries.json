@@ -1,0 +1,1128 @@
+{"queries": [
+    {
+        "name": "Top 10: Users with Most Local Admin Rights",
+        "category": "Top 10",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-(n) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "Top 10: Computers with Most Sessions",
+        "category": "Top 10",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-(n) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "Top 10: Users with Most Sessions",
+        "category": "Top 10",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)-[r:HasSession]->(n) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "Top 10: Users with most cross-domain sessions",
+        "category": "Top 10",
+        "queryList": [{
+            "final": true,                
+            "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[r:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain WITH u, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(c:Computer)-[r:HasSession]->(u) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "HVT: View all",
+        "category": "HVT",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (m {highvalue:true}) RETURN m ORDER BY m.name",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "HVT: [NT][TBC] From owned",
+        "category": "HVT",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = allShortestPaths((o {owned: true})-[r:{}*1..]->(c:Computer)) WHERE NOT o = c RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "Owned: List all users",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {owned:true}) RETURN u"
+            }]
+    },{
+        "name": "Owned: List all enabled users",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {owned:true, enabled:true}) RETURN u"
+            }]
+    },{
+        "name": "Owned: List all enabled users NOT 'Domain Admins'",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE NOT g.objectid ENDS WITH '-519' OR NOT g.objectid ENDS WITH '-512' RETURN u"
+            }]
+    },{
+        "name": "Owned: List all enabled users ARE 'Enterprise Admins'",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE g.name STARTS WITH 'ENTERPRISE ADMIN' OR g.objectid ENDS WITH '-519' RETURN u"
+            }]
+    },{
+        "name": "Owned: List all enabled users ARE 'Domain Admins'",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE g.name STARTS WITH 'DOMAIN ADMIN' OR g.objectid ENDS WITH '-512' RETURN u"
+            }]
+    },{
+        "name": "Owned: List all enabled users with an email address",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {owned:true, enabled:true}) WHERE exists(u.email) RETURN u"
+            }]
+    },{
+        "name": "Owned: List all enabled users that can RDP",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true, enabled:true})-[r:CanRDP]->(c:Computer) RETURN p"
+        }]
+    },{
+        "name": "Owned: [NT] List all computers",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (c:Computer {owned:true}) RETURN c ORDER BY c.name"
+        }]
+    },{
+        "name": "Owned: List all user->MemberOf->group",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) RETURN p"
+        }]
+    },{
+        "name": "Owned: List the groups of all owned users",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) RETURN g"
+        }]
+    },{
+        "name": "Owned: Find all group membership routes with dangerous rights over group",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(g2:Group) RETURN p ORDER BY g1.name"
+        }]
+    },{
+        "name": "Owned: Route owned user where group membership has dangerous rights over user",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u1:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(u2:User) RETURN p ORDER BY g1.name"
+        }]
+    },{
+        "name": "Owned: Route from owned user to all nodes with 'Unconstrained Delegation'",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,                
+            "query": "MATCH p=(o {unconstraineddelegation: true, enabled: true})<-[r]-(u:User {owned:true, enabled:true}) RETURN p",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Owned: [NT][TBC] route to AAD:AZGlobalAdmin",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (au:AZUser) MATCH p=(u:User {owned:true, enabled:true})-[r]->(au) RETURN p"
+        }]
+    },{
+        "name": "Owned: Find all Owners of Azure Applications with Owners to Service Principals",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (n {enabled:true, owned:true})-[:AZOwns]->(azapp:AZApp)-[r]->(azsp:AZServicePrincipal) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "Owned: Find all Owners of Azure Applications with Owners to Service Principals with Dangerous Rights",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (n {enabled:true, owned:true})-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "Owned: Find all users->groups with network shares",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true})-[:MemberOf*1..]->(g:Group) WHERE g.description contains \"\\\\\" return p"
+        }]
+    },{
+        "name": "Owned: Find all Dangerous Rights from owned",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true})-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(c:Computer) RETURN p"
+        }]
+    },{
+        "name": "Owned: Route all sessions to computers WITHOUT LAPS",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true})<-[r:HasSession]-(c:Computer {haslaps:false}) RETURN p ORDER BY c.name"
+        }]
+    },{
+        "name": "Owned: Route all sessions to computers",
+        "category": "Owned",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {owned:true})<-[r:HasSession]-(c:Computer) RETURN p ORDER BY c.name"
+        }]
+    },{
+        "name": "Domain: Return Domain Object",
+        "category": "Domain",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (m:Domain) RETURN m",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "Domain: Find all sessions a user has in a specific domain per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain...",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,                
+            "query": "MATCH p=(u:User {domain: $result})<-[r:HasSession]-(c:Computer {domain: $result}) RETURN p ORDER BY c.name",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Domain: Find all cross-domain sessions",
+        "category": "Domain",
+        "queryList": [{
+            "final": true,                
+            "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Domain: Find all cross-domain sessions per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain...",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,                
+            "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true, domain:$result})<-[:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Domain: Find all enabled kerberoastable targets per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain...",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,                
+            "query": "MATCH (u:User {hasspn: true, enabled:true, domain:$result}) RETURN u",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Domain: Find all enabled AS-REP Roasting targets per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain...",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,                
+            "query": "MATCH (u:User {dontreqpreauth: true, domain:$result, enabled:true}) RETURN u",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Domain: Find all nodes with 'Unconstrained Delegation'",
+        "category": "Domain",
+        "queryList": [{
+            "final": true,                
+            "query": "MATCH (o {unconstraineddelegation: true, enabled: true}) RETURN o",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Domain: Find all nodes with 'Unconstrained Delegation' per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain...",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,                
+            "query": "MATCH (o {unconstraineddelegation: true, enabled: true, domain:$result}) RETURN o",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Domain: List all enabled users per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH (u:User {enabled:true, domain: $result}) RETURN u"
+        }]
+    },{
+        "name": "Domain: Find all with description field per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH (u:User {domain: $result}) WHERE u.description<>\"\" return u"
+        }]
+    },{
+        "name": "Domain: Find all enabled users that don't require passwords per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH (u:User {passwordnotreqd:true, enabled:true, domain: $result}) return u"
+        }]
+    },{
+        "name": "Domain: Find all where the \"userpassword\" attribute is populated per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH (u:User {enabled:true, domain: $result}) WHERE u.userpassword IS NOT null RETURN u"
+        }]
+    },{
+        "name": "Domain: List all with password never expires per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH (u:User {pwdneverexpires:true, enabled:true, domain: $result}) return u"
+        }]
+    },{
+        "name": "Domain: List all with password never expires and not changed in last 365 days per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH (u:User {enabled:true, domain: $result}) WHERE u.pwdneverexpires=TRUE AND u.pwdlastset < (datetime().epochseconds - (365 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] return u"
+        }]
+    },{
+        "name": "Domain: List all with 'Local Admin' rights",
+        "category": "Domain",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User)-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
+            }]
+    },{
+        "name": "Domain: List all with 'Local Admin' rights per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH p=(u:User {domain: $result})-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
+            }]
+    },{
+        "name": "Domain: Map all 'CanRDP' rights to machines",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(m:User)-[r:CanRDP]->(c:Computer) RETURN p"
+        }]
+    },{
+        "name": "Domain: Map all 'CanRDP' rights to machines per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH p=(m:User {domain: $result})-[r:CanRDP]->(c:Computer) RETURN p"
+        }]
+    },{
+        "name": "Domain: List all computers WITHOUT LAPS",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH (c:Computer {haslaps:false, domain: $result}) RETURN c ORDER BY c.name"
+        }]
+    },{
+        "name": "Domain: Find all groups that contain keyword 'admin'",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "Match (n:Group {domain:$result}) WHERE n.name CONTAINS \"ADMIN\" return n"
+        }]
+    },{
+        "name": "Domain: Find all groups that contain keyword 'sql'",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "Match (n:Group {domain:$result}) WHERE n.name CONTAINS \"SQL\" return n"
+        }]
+    },{
+        "name": "Domain: Find all groups that contain keyword 'citrix'",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "Match (n:Group {domain:$result}) WHERE n.name CONTAINS \"CITRIX\" return n"
+        }]
+    },{
+        "name": "Domain: [NT] Find all with network shares per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH (u:User {domain: $result}) WHERE u.description contains \"\\\\\" return u"
+        }]
+    },{
+        "name": "Domain: Route user where group membership has dangerous rights over group per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH p=(u:User {enabled:true, domain: $result})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group) RETURN p"
+        }]
+    },{
+        "name": "Domain: Route user where group membership has dangerous rights over user per domain",
+        "category": "Domain",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH p=(u1:User {enabled:true, domain: $result})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u2:User) WHERE NOT u1 = u2 RETURN p"
+        }]
+    },{
+        "name": "Users: Find all with description field",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User) WHERE u.description<>\"\" return u"
+        }]
+    },{
+        "name": "Users: Find all enabled kerberoastable targets",
+        "category": "Users",
+        "queryList": [{
+            "final": true,                
+            "query": "MATCH (u:User {hasspn: true, enabled:true}) RETURN u",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Users: Route enabled kerberoastable targets to 'Local Admins' rights to machines",
+        "category": "Users",
+        "queryList": [{
+            "final": true,                
+            "query": "MATCH p=(u1:User {hasspn: true, enabled:true})-[r1:AdminTo]->(c:Computer) RETURN p",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Users: Route enabled kerberoastable targets to 'Local Admins' rights to machines with active user sessions",
+        "category": "Users",
+        "queryList": [{
+            "final": true,                
+            "query": "MATCH p=(u1:User {hasspn: true, enabled:true})-[r1:AdminTo]->(c:Computer)<-[r2:HasSession]-(u2:User) RETURN p",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Users: Find all enabled AS-REP Roasting targets",
+        "category": "Users",
+        "queryList": [{
+            "final": true,                
+            "query": "MATCH (u:User {dontreqpreauth: true, enabled:true}) RETURN u",
+            "allowCollapse": false
+        }]
+    },{
+        "name": "Users: List all enabled users with an email address",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {enabled:true}) WHERE exists(u.email) RETURN u"
+            }]
+    },{
+        "name": "Users: Find all enabled users that don't require passwords",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {passwordnotreqd:true, enabled:true}) return u"
+        }]
+    },{
+        "name": "Users: Find all where the \"userpassword\" attribute is populated",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {enabled:true}) WHERE u.userpassword IS NOT null RETURN u"
+        }]
+    },{
+        "name": "Users: List all with password never expires",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {pwdneverexpires:true, enabled:true}) return u"
+        }]
+    },{
+        "name": "Users: List all that logged in within the last 90 days",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {enabled:true}) WHERE u.lastlogon < (datetime().epochseconds - (90 * 86400)) and NOT u.lastlogon IN [-1.0, 0.0] RETURN u"
+        }]
+    },{
+        "name": "Users: List all passwords last set within the last 90 days",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {enabled:true}) WHERE u.pwdlastset < (datetime().epochseconds - (90 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] RETURN u"
+        }]
+    },{
+        "name": "Users: List all never logged on but still active",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {enabled:true}) WHERE u.lastlogontimestamp=-1.0 RETURN u"
+        }]
+    },{
+        "name": "Users: List all enabled users",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {enabled:true}) RETURN u"
+        }]
+    },{
+        "name": "Users: List all with password never expires and not changed in last 365 days",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User {enabled:true}) WHERE u.pwdneverexpires=TRUE AND u.pwdlastset < (datetime().epochseconds - (365 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] return u"
+        }]
+    },{
+        "name": "Users: List all enabled users with 'Local Admin' rights",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {enabled:true})-[r:AdminTo]->(c:Computer) RETURN p"
+            }]
+    },{
+        "name": "Users: List all enabled users with 'Local Admin' rights to computer with active sessions",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u1:User {enabled:true})-[r1:AdminTo]->(c:Computer)<-[r2:HasSession]-(u2:User) RETURN p"
+            }]
+    },{
+        "name": "Users: Map all 'CanRDP' rights to machines",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User)-[r:CanRDP]->(c:Computer) RETURN p"
+        }]
+    },{
+        "name": "Users: [NT] Find all with network shares",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (u:User) WHERE u.description contains \"\\\\\" return u"
+        }]
+    },{
+        "name": "User: Route user where group membership has dangerous rights over group",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group) RETURN p"
+        }]
+    },{
+        "name": "User: Route user where group membership has dangerous rights over user",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u1:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u2:User) WHERE NOT u1 = u2 RETURN p"
+        }]
+    },{
+        "name": "Users: [NT][TBC] route to AAD:AZGlobalAdmin",
+        "category": "Users",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User {enabled:true})-[r:AZGlobalAdmin*1..]->(n) RETURN p"
+        }]
+    },{
+        "name": "Computers: List all computers WITHOUT LAPS",
+        "category": "Computers",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (c:Computer {haslaps:false}) RETURN c ORDER BY c.name"
+        }]
+    },{
+        "name": "Computers: List all computers WITH LAPS",
+        "category": "Computers",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (c:Computer {haslaps:true}) RETURN c ORDER BY c.name"
+        }]
+    },{
+        "name": "Computers: Route all sessions to computers WITHOUT LAPS",
+        "category": "Computers",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User)<-[r:HasSession]-(c:Computer {haslaps:false}) RETURN p ORDER BY c.name"
+        }]
+    },{
+        "name": "GPO: View all",
+        "category": "GPO",
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "Match (n:GPO {domain:$result}) RETURN n"
+        }]
+    },{
+        "name": "GPO: [NT] Find all with network shares",
+        "category": "GPO",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH (n:GPO {domain:$result}) WHERE n.description contains \"\\\\\" return n"
+        }]
+    },{
+        "name": "Group: Find all enabled 'Enterprise Admins' Account Sessions",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE g1.name STARTS WITH 'ENTERPRISE ADMIN' RETURN p ORDER BY c.name"
+        }]
+    },{
+        "name": "Group: Find all enabled 'Domain Admins' Account Sessions",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE g1.name STARTS WITH 'DOMAIN ADMIN' OR g1.objectid ENDS WITH '-512' RETURN p ORDER BY c.name"
+        }]
+    },{
+        "name": "Group: Find all enabled SVC accounts with 'Domain Admins' Group membership",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE g1.name STARTS WITH 'DOMAIN ADMIN' OR g1.objectid ENDS WITH '-512' AND u.name CONTAINS 'svc' RETURN p ORDER BY c.name"
+        }]
+    },{
+        "name": "Group: Find all 'Domain Users' Group memberships",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
+        }]
+    },{
+        "name": "Group: Find all 'Domain Users' Group memberships with Dangerous Rights group->user",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
+        }]
+    },{
+        "name": "Group: Find all 'Domain Users' Group memberships with Dangerous Rights to enabled group->user",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
+        }]
+    },{
+        "name": "Group: Find all 'Domain Users' Group memberships with Dangerous Rights group->group",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
+        }]
+    },{
+        "name": "Group: Find all Dangerous Rights 'Domain Users' group->computer",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
+        }]
+    },    {
+        "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+        }]
+    },{
+        "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships with Dangerous Rights group->user",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+        }]
+    },{
+        "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships with Dangerous Rights to enabled group->user",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+        }]
+    },{
+        "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships with Dangerous Rights group->group",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+        }]
+    },{
+        "name": "Group: Find all Dangerous Rights 'AUTHENTICATED USERS' group->computer",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+        }]
+    },{
+        "name": "Group: [DANGEROUS!!!] Find all Dangerous Rights from any group->group",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group) RETURN p ORDER BY g1.name"
+        }]
+    },{
+        "name": "Group: [DANGEROUS!!!] Find all Dangerous Rights from any group->user",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) RETURN p ORDER BY g1.name"
+        }]
+    },{
+        "name": "Group: [DANGEROUS!!!] Find all Dangerous Rights from any group->computer",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) RETURN p ORDER BY g1.name"
+        }]
+    },{
+        "name": "Group: View all",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "Match (g:Group) RETURN g"
+        }]
+    },{
+        "name": "Group: Find all with network shares",
+        "category": "Group",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH (n:Group {domain:$result}) WHERE n.description contains \"\\\\\" return n"
+        }]
+    },{
+        "name": "Group: List all with 'Local Admin' rights",
+        "category": "Group",
+        "requireNodeSelect": true,
+        "queryList": [{
+            "final": false,
+            "title": "Select source domain",
+            "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },{
+            "final": true,
+            "query": "MATCH p=(m:Group {domain:$result})-[r:AdminTo]->(n:Computer) RETURN p ORDER BY m.name"
+            }]
+    },{
+        "name": "Group: [NT][TBC] route to AAD:AZGlobalAdmin",
+        "category": "Group",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (m:Group) WHERE m.enabled=TRUE WITH m MATCH p=(m)-[r:AZGlobalAdmin*1..]->(n) RETURN p"
+        }]
+    },{
+        "name": "AAD: Find all Tenancy",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (p:AZTenant) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all Azure Users",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (azu:AZUser) RETURN azu",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: All On-Premise Users that are part of the 'Global Administrator' Role",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(u:User)-[r:AZGlobalAdmin*1..]->(azt:AZTenant) RETURN u",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: All Azure Users that are part of the 'Global Administrator' Role",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(azu:AZUser)-[r:AZGlobalAdmin*1..]->(azt:AZTenant) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: All ServicePrincipals that are part of the 'Global Administrator' Role",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p=(azsp:AZServicePrincipal)-[r:AZGlobalAdmin*1..]->(azt:AZTenant) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: [NT] All On-Prem users with edges to Azure",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH  p=(m:User)-[r:AZResetPassword|AZOwns|AZUserAccessAdministrator|AZContributor|AZAddMembers|AZGlobalAdmin|AZVMContributor|AZOwnsAZAvereContributor]->(n) WHERE m.objectid CONTAINS 'S-1-5-21' RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all Owners of Azure Applications",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (n)-[r:AZOwns]->(g:AZApp) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all Privileged Service Principals",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (azsp:AZServicePrincipal)-[r]->(azt:AZTenant) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all AzUser Owners of Azure Applications with Owners to Service Principals",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (azu1:AZUser)-[:AZOwns]->(azapp:AZApp)-[r]->(azsp:AZServicePrincipal) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all AzUser Owners of Azure Applications with Owners to Service Principals with Dangerous Rights",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (azu:User)-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all On-Premise User Owners of Azure Applications with Owners to Service Principals",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (u1:User)-[:AZOwns]->(azapp:AZApp)-[r]->(azsp:AZServicePrincipal) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all On-Premise User Owners of Azure Applications with Owners to Service Principals with Dangerous Rights",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (u1:User)-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all AzGroup Owners of Azure Applications with Owners to Service Principals",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (azg1:AZGroup)-[:AZOwns]->(azapp:AZApp)-[r]->(azsp:AZServicePrincipal) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all AzGroup Owners of Azure Applications with Owners to Service Principals with Dangerous Rights",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (azg1:AZGroup)-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all On-Premise Group Owners of Azure Applications with Owners to Service Principals",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (g1:Group)-[:AZOwns]->(azapp:AZApp)-[r]->(azsp:AZServicePrincipal) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all On-Premise Group Owners of Azure Applications with Owners to Service Principals with Dangerous Rights",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (g1:Group)-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all On-Premise User Owners of Azure Applications with Owners to Service Principals with Dangerous Rights to tenancy where AZUser has rights to on-premise Users that have dangerous rights to a on-prem group",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (u1:User)-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant)-[r3]->(azu:AZUser)-[r4]->(u2:User)-[r5:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g1:Group) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all On-Premise User Owners of Azure Applications with Owners to Service Principals with Dangerous Rights to tenancy where AZUser has rights to enabled on-premise Users with that have dangerous group membership rights to highvalued groups",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (u1:User)-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant)-[r3]->(azu:AZUser)-[r4]->(u2:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group {highvalue:true}) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all On-Premise User Owners of Azure Applications with Owners to Service Principals with Dangerous Rights to tenancy where AZUser has rights to enabled on-premise Users with that have dangerous group membership rights to highvalued groups with rights to domain",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (u1:User)-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant)-[r3]->(azu:AZUser)-[r4]->(u2:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r5:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group {highvalue:true})-[r6]->(d1:Domain) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: Find all On-Premise User Owners of Azure Applications with Owners to Service Principals with Dangerous Rights to tenancy where AZUser has rights to enabled on-premise Users with that have dangerous group membership rights to highvalued groups with rights to domain including cross-domain routes",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (u1:User)-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant)-[r3]->(azu:AZUser)-[r4]->(u2:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r5:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group {highvalue:true})-[r6]->(d1:Domain)-[r7]->(d2:Domain) WHERE not d1 = d2 RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: [NT] All Azure AD Groups that are synchronized with On-Premise AD",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH (n:Group) WHERE n.objectid CONTAINS 'S-1-5' AND n.azsyncid IS NOT NULL RETURN n",
+            "allowCollapse": true
+        }]
+    },{
+        "name": "AAD: [NT] Find all paths to an Azure VM",
+        "category": "AAD",
+        "queryList": [{
+            "final": true,
+            "query": "MATCH p = (n)-[r]->(g:AZVM) RETURN p",
+            "allowCollapse": true
+        }]
+    },{
+      "name": "Find all Certificate Templates",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' RETURN n"
+        }]
+    },{
+      "name": "Find enabled Certificate Templates",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' and n.Enabled = true RETURN n"
+        }]
+    },{
+      "name": "Find Certificate Authorities",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH (n:GPO) WHERE n.type = 'Enrollment Service' RETURN n"
+        }]
+    },{
+      "name": "Show Enrollment Rights for Certificate Template",
+      "category": "Certificates",
+      "queryList": [{
+          "final": false,
+          "title": "Select a Certificate Template...",
+          "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' RETURN n.name"
+        },{
+          "final": true,
+          "query": "MATCH p=(g)-[:Enroll|AutoEnroll]->(n:GPO {name:$result}) WHERE n.type = 'Certificate Template' return p",
+          "allowCollapse": false
+        }]
+    },{
+      "name": "Show Rights for Certificate Authority",
+      "category": "Certificates",
+      "queryList": [{
+          "final": false,
+          "title": "Select a Certificate Authority...",
+          "query": "MATCH (n:GPO) WHERE n.type = 'Enrollment Service' RETURN n.name"
+        },{
+          "final": true,
+          "query": "MATCH p=(g)-[:ManageCa|ManageCertificates|Auditor|Operator|Read|Enroll]->(n:GPO {name:$result}) return p",
+          "allowCollapse": false
+        }]
+    },{
+      "name": "Find Misconfigured Certificate Templates (ESC1)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' and n.`Enrollee Supplies Subject` = true and n.`Client Authentication` = true and n.`Enabled` = true  RETURN n"
+        }]
+    },{
+      "name": "Shortest Paths to Misconfigured Certificate Templates from Owned Principals (ESC1)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO)) WHERE  g<>n and n.type = 'Certificate Template' and n.`Enrollee Supplies Subject` = true and n.`Client Authentication` = true and n.`Enabled` = true return p"
+        }]
+    },{
+      "name": "Find Misconfigured Certificate Templates (ESC2)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' and n.`Enabled` = true and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage`)  RETURN n"
+        }]
+    },{
+      "name": "Shortest Paths to Misconfigured Certificate Templates from Owned Principals (ESC2)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO)) WHERE  g<>n and n.type = 'Certificate Template' and n.`Enabled` = true and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage`) return p"
+        }]
+    },{
+      "name": "Find Enrollment Agent Templates (ESC3)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' and n.`Enabled` = true and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage` or 'Certificate Request Agent' IN n.`Extended Key Usage`)  RETURN n"
+        }]
+    },{
+      "name": "Shortest Paths to Enrollment Agent Templates from Owned Principals (ESC3)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO)) WHERE  g<>n and n.type = 'Certificate Template' and n.`Enabled` = true and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage` or 'Certificate Request Agent' IN n.`Extended Key Usage`) return p"
+        }]
+    },{
+      "name": "Shortest Paths to Vulnerable Certificate Template Access Control (ESC4)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH p=shortestPath((g)-[:GenericAll|GenericWrite|Owns|WriteDacl|WriteOwner*1..]->(n:GPO)) WHERE  g<>n and n.type = 'Certificate Template' and n.`Enabled` = true RETURN p"
+        }]
+    },{
+      "name": "Shortest Paths to Vulnerable Certificate Template Access Control from Owned Principals (ESC4)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH p=allShortestPaths((g {owned:true})-[r*1..]->(n:GPO)) WHERE g<>n and n.type = 'Certificate Template' and n.Enabled = true and NONE(x in relationships(p) WHERE type(x) = 'Enroll' or type(x) = 'AutoEnroll') return p"
+        }]
+    },{
+      "name": "Find Certificate Authorities with User Specified SAN (ESC6)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH (n:GPO) WHERE n.type = 'Enrollment Service' and n.`User Specified SAN` = 'Enabled' RETURN n"
+        }]
+    },{
+      "name": "Shortest Paths to Vulnerable Certificate Authority Access Control (ESC7)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH p=shortestPath((g)-[r:GenericAll|GenericWrite|Owns|WriteDacl|WriteOwner|ManageCa|ManageCertificates*1..]->(n:GPO)) WHERE  g<>n and n.type = 'Enrollment Service' RETURN p"
+        }]
+    },{
+      "name": "Shortest Paths to Vulnerable Certificate Authority Access Control from Owned Principals (ESC7)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO)) WHERE  g<>n and n.type = 'Enrollment Service' and NONE(x in relationships(p) WHERE type(x) = 'Enroll' or type(x) = 'AutoEnroll') RETURN p"
+        }]
+    },{
+      "name": "Find Certificate Authorities with HTTP Web Enrollment (ESC8)",
+      "category": "Certificates",
+      "queryList": [{
+          "final": true,
+          "query": "MATCH (n:GPO) WHERE n.type = 'Enrollment Service' and n.`Web Enrollment` = 'Enabled' RETURN n"
+        }]
+    }
+]}
