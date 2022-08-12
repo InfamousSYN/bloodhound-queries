@@ -127,7 +127,7 @@
         "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
     },{
         "final": true,
-        "query": "MATCH (n:Group {domain:$result}) WHERE n.description contains \"\\\\\" return n"
+        "query": "MATCH (n:Group {domain:$result}) WHERE n.description contains '\\' return n"
     }]
 },{
     "name": "Group: List all with 'Local Admin' rights",
