@@ -51,7 +51,7 @@
     "category": "AAD",
     "queryList": [{
         "final": true,
-        "query": "MATCH p=(u:User)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN u",
+        "query": "MATCH p=(u:User)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
         "allowCollapse": true
     }]
 },{
