@@ -19,3 +19,10 @@ jobs:
           cmd: echo "{\"queries\":$(jq -s "add" queries/top_10.json queries/hvt.json queries/owned.json queries/domain.json queries/users.json queries/group.json queries/computers.json queries/gpo.json queries/certificates.json queries/aad.json)}" > customqueries.json
       - name: cat customerqueries.json
         run: cat customqueries.json
+      - uses: EndBug/add-and-commit@v9
+        with:
+          author_name: 'InfamousSYN'
+          author_email: 'ainfamoussyn@gmail.com'
+          message: 'automatically generated customqueries.json'
+          add: 'customqueries.json'
+          push: true
