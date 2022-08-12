@@ -1,1 +1,17 @@
-
+{
+    "name": "HVT: View all",
+    "category": "HVT",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (m {highvalue:true}) RETURN m ORDER BY m.name",
+        "allowCollapse": true
+    }]
+},{
+    "name": "HVT: [NT][TBC] From owned",
+    "category": "HVT",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p = allShortestPaths((o {owned: true})-[r:{}*1..]->(c:Computer)) WHERE NOT o = c RETURN p",
+        "allowCollapse": true
+    }]
+}
