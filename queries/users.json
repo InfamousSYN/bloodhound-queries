@@ -1,1 +1,152 @@
-[{}]
+[{
+    "name": "Users: Find all with description field",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User) WHERE u.description<>\"\" return u"
+    }]
+},{
+    "name": "Users: Find all enabled kerberoastable targets",
+    "category": "Users",
+    "queryList": [{
+        "final": true,                
+        "query": "MATCH (u:User {hasspn: true, enabled:true}) RETURN u",
+        "allowCollapse": false
+    }]
+},{
+    "name": "Users: Route enabled kerberoastable targets to 'Local Admins' rights to machines",
+    "category": "Users",
+    "queryList": [{
+        "final": true,                
+        "query": "MATCH p=(u1:User {hasspn: true, enabled:true})-[r1:AdminTo]->(c:Computer) RETURN p",
+        "allowCollapse": false
+    }]
+},{
+    "name": "Users: Route enabled kerberoastable targets to 'Local Admins' rights to machines with active user sessions",
+    "category": "Users",
+    "queryList": [{
+        "final": true,                
+        "query": "MATCH p=(u1:User {hasspn: true, enabled:true})-[r1:AdminTo]->(c:Computer)<-[r2:HasSession]-(u2:User) RETURN p",
+        "allowCollapse": false
+    }]
+},{
+    "name": "Users: Find all enabled AS-REP Roasting targets",
+    "category": "Users",
+    "queryList": [{
+        "final": true,                
+        "query": "MATCH (u:User {dontreqpreauth: true, enabled:true}) RETURN u",
+        "allowCollapse": false
+    }]
+},{
+    "name": "Users: List all enabled users with an email address",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE exists(u.email) RETURN u"
+        }]
+},{
+    "name": "Users: Find all enabled users that don't require passwords",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {passwordnotreqd:true, enabled:true}) return u"
+    }]
+},{
+    "name": "Users: Find all where the \"userpassword\" attribute is populated",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.userpassword IS NOT null RETURN u"
+    }]
+},{
+    "name": "Users: List all with password never expires",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {pwdneverexpires:true, enabled:true}) return u"
+    }]
+},{
+    "name": "Users: List all that logged in within the last 90 days",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.lastlogon < (datetime().epochseconds - (90 * 86400)) and NOT u.lastlogon IN [-1.0, 0.0] RETURN u"
+    }]
+},{
+    "name": "Users: List all passwords last set within the last 90 days",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.pwdlastset < (datetime().epochseconds - (90 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] RETURN u"
+    }]
+},{
+    "name": "Users: List all never logged on but still active",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.lastlogontimestamp=-1.0 RETURN u"
+    }]
+},{
+    "name": "Users: List all enabled users",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) RETURN u"
+    }]
+},{
+    "name": "Users: List all with password never expires and not changed in last 365 days",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.pwdneverexpires=TRUE AND u.pwdlastset < (datetime().epochseconds - (365 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] return u"
+    }]
+},{
+    "name": "Users: List all enabled users with 'Local Admin' rights",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {enabled:true})-[r:AdminTo]->(c:Computer) RETURN p"
+        }]
+},{
+    "name": "Users: List all enabled users with 'Local Admin' rights to computer with active sessions",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u1:User {enabled:true})-[r1:AdminTo]->(c:Computer)<-[r2:HasSession]-(u2:User) RETURN p"
+        }]
+},{
+    "name": "Users: Map all 'CanRDP' rights to machines",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User)-[r:CanRDP]->(c:Computer) RETURN p"
+    }]
+},{
+    "name": "Users: [NT] Find all with network shares",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User) WHERE u.description contains \"\\\\\" return u"
+    }]
+},{
+    "name": "User: Route user where group membership has dangerous rights over group",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group) RETURN p"
+    }]
+},{
+    "name": "User: Route user where group membership has dangerous rights over user",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u1:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u2:User) WHERE NOT u1 = u2 RETURN p"
+    }]
+},{
+    "name": "Users: [NT][TBC] route to AAD:AZGlobalAdmin",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH p=(u:User {enabled:true})-[r:AZGlobalAdmin*1..]->(n) RETURN p"
+    }]
+}]
