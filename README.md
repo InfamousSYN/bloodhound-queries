@@ -18,7 +18,7 @@ C:\Users\%USERNAME%\AppData\Roaming\bloodhound\customqueries.json
 
 **AD**
 ```
-
+[r:Owns|AdminTo|SQLAdmin*1..]
 ```
 
 **AAD**
@@ -30,7 +30,19 @@ C:\Users\%USERNAME%\AppData\Roaming\bloodhound\customqueries.json
 
 **AD**
 ```
+[r:Owns|GenericAll|GenericWrite|WriteOwner|WriteDacl|WriteSPN|AllExtendedRights|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AllowedToAct|AddAllowedToAct]
+```
 
+**AAD**
+```
+
+```
+
+## Access
+
+**AD**
+```
+[r:AdminTo|SQLAdmin|HasSession|CanRDP]
 ```
 
 **AAD**
