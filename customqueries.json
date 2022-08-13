@@ -111,7 +111,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group)-[r]->(:Domain) WHERE (NOT g.objectid =~ $domain_admins OR NOT g.objectid =~ $enterprise_admins OR NOT g.objectid =~ $administrators OR NOT g.objectid =~ $account_operators) RETURN p",
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE (NOT g.objectid =~ $domain_admins OR NOT g.objectid =~ $enterprise_admins OR NOT g.objectid =~ $administrators OR NOT g.objectid =~ $account_operators) RETURN p",
         "props": {
           "domain_admins": "S-1-5-.*-512",
           "enterprise_admins": "S-1-5-.*-519",
@@ -127,7 +127,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group)-[r]->(:Domain) WHERE (g.objectid =~ $domain_admins OR g.objectid =~ $enterprise_admins OR g.objectid =~ $administrators OR g.objectid =~ $account_operators) RETURN p",
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE (g.objectid =~ $domain_admins OR g.objectid =~ $enterprise_admins OR g.objectid =~ $administrators OR g.objectid =~ $account_operators) RETURN p",
         "props": {
           "domain_admins": "S-1-5-.*-512",
           "enterprise_admins": "S-1-5-.*-519",
