@@ -10,7 +10,7 @@
     "category": "Group",
     "queryList": [{
         "final": true,
-        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE (g.objectid ENDS WITH $domain_admins OR g.objectid ENDS WITH $enterprise_admins OR g.objectid ENDS WITH $administrators OR g.objectid ENDS WITH $account_operators) RETURN p ORDER BY c.name",
+        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE (g1.objectid ENDS WITH $domain_admins OR g1.objectid ENDS WITH $enterprise_admins OR g1.objectid ENDS WITH $administrators OR g1.objectid ENDS WITH $account_operators) RETURN p ORDER BY c.name",
         "props": {
             "domain_admins": "-512",
             "enterprise_admins": "-519",
@@ -23,7 +23,7 @@
     "category": "Group",
     "queryList": [{
         "final": true,
-        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE (g.objectid ENDS WITH $domain_admins OR g.objectid ENDS WITH $enterprise_admins OR g.objectid ENDS WITH $administrators OR g.objectid ENDS WITH $account_operators) AND u.name CONTAINS 'svc' RETURN p ORDERc.name",
+        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE (g1.objectid ENDS WITH $domain_admins OR g1.objectid ENDS WITH $enterprise_admins OR g1.objectid ENDS WITH $administrators OR g1.objectid ENDS WITH $account_operators) AND u.name CONTAINS 'svc' RETURN p ORDERc.name",
         "props": {
             "domain_admins": "-512",
             "enterprise_admins": "-519",
