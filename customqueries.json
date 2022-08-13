@@ -86,42 +86,54 @@
     ]
   },
   {
-    "name": "Owned: List all enabled users NOT 'Domain Admins'",
-    "category": "Owned",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE NOT g.objectid ENDS WITH '-519' OR NOT g.objectid ENDS WITH '-512' RETURN u"
-      }
-    ]
-  },
-  {
-    "name": "Owned: List all enabled users ARE 'Enterprise Admins'",
-    "category": "Owned",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE g.name STARTS WITH 'ENTERPRISE ADMIN' OR g.objectid ENDS WITH '-519' RETURN u"
-      }
-    ]
-  },
-  {
-    "name": "Owned: List all enabled users ARE 'Domain Admins'",
-    "category": "Owned",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE g.name STARTS WITH 'DOMAIN ADMIN' OR g.objectid ENDS WITH '-512' RETURN u"
-      }
-    ]
-  },
-  {
     "name": "Owned: List all enabled users with an email address",
     "category": "Owned",
     "queryList": [
       {
         "final": true,
         "query": "MATCH (u:User {owned:true, enabled:true}) WHERE exists(u.email) RETURN u"
+      }
+    ]
+  },
+  {
+    "name": "Owned: List all owned user group membership",
+    "category": "Owned",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) RETURN p"
+      }
+    ]
+  },
+  {
+    "name": "Owned: List all enabled users not members of privileged groups",
+    "category": "Owned",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group)-[r]->(:Domain) WHERE (NOT g.objectid =~ $domain_admins OR NOT g.objectid =~ $enterprise_admins OR NOT g.objectid =~ $administrators OR NOT g.objectid =~ $account_operators) RETURN p",
+        "props": {
+          "domain_admins": "S-1-5-.*-512",
+          "enterprise_admins": "S-1-5-.*-519",
+          "administrators": "S-1-5-.*-544",
+          "account_operators": "S-1-5-.*-548"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Owned: List all enabled users members of privileged groups",
+    "category": "Owned",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group)-[r]->(:Domain) WHERE (g.objectid =~ $domain_admins OR g.objectid =~ $enterprise_admins OR g.objectid =~ $administrators OR g.objectid =~ $account_operators) RETURN p",
+        "props": {
+          "domain_admins": "S-1-5-.*-512",
+          "enterprise_admins": "S-1-5-.*-519",
+          "administrators": "S-1-5-.*-544",
+          "account_operators": "S-1-5-.*-548"
+        }
       }
     ]
   },
@@ -142,26 +154,6 @@
       {
         "final": true,
         "query": "MATCH (c:Computer {owned:true}) RETURN c ORDER BY c.name"
-      }
-    ]
-  },
-  {
-    "name": "Owned: List all user->MemberOf->group",
-    "category": "Owned",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) RETURN p"
-      }
-    ]
-  },
-  {
-    "name": "Owned: List the groups of all owned users",
-    "category": "Owned",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) RETURN g"
       }
     ]
   },
@@ -197,44 +189,43 @@
     ]
   },
   {
-    "name": "Owned: [NT][TBC] route to AAD:AZGlobalAdmin",
+    "name": "Owned: Find all owned user with privileged access to Azure Tenancy (Required: azurehound)",
     "category": "Owned",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (au:AZUser) MATCH p=(u:User {owned:true, enabled:true})-[r]->(au) RETURN p"
+        "query": "MATCH p=(n {owned:true, enabled:true})-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(:AZTenant) RETURN p"
       }
     ]
   },
   {
-    "name": "Owned: Find all Owners of Azure Applications with Owners to Service Principals",
+    "name": "Owned: Find all owned user where group membership grants privileged access to Azure Tenancy (Required: azurehound)",
     "category": "Owned",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p = (n {enabled:true, owned:true})-[:AZOwns]->(azapp:AZApp)-[r]->(azsp:AZServicePrincipal) RETURN p",
+        "query": "MATCH p=(n {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(:AZTenant) RETURN p"
+      }
+    ]
+  },
+  {
+    "name": "Owned: Find all Owners of Azure Applications with Owners to Service Principals with Dangerous Rights (Required: azurehound)",
+    "category": "Owned",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p = (n {enabled:true, owned:true})-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
         "allowCollapse": true
       }
     ]
   },
   {
-    "name": "Owned: Find all Owners of Azure Applications with Owners to Service Principals with Dangerous Rights",
+    "name": "Owned: Find all owned groups that grant access to network shares",
     "category": "Owned",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p = (n {enabled:true, owned:true})-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r2]->(azt:AZTenant) RETURN p",
-        "allowCollapse": true
-      }
-    ]
-  },
-  {
-    "name": "Owned: Find all users->groups with network shares",
-    "category": "Owned",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true})-[:MemberOf*1..]->(g:Group) WHERE g.description contains \"\\\\\" return p"
+        "query": "MATCH p=(u:User {owned:true})-[:MemberOf*1..]->(g:Group) WHERE g.description contains '\\' return p"
       }
     ]
   },
@@ -249,7 +240,7 @@
     ]
   },
   {
-    "name": "Owned: Route all sessions to computers WITHOUT LAPS",
+    "name": "Owned: Route all sessions to computers WITHOUT LAPS (Required: sessions)",
     "category": "Owned",
     "queryList": [
       {
@@ -259,7 +250,7 @@
     ]
   },
   {
-    "name": "Owned: Route all sessions to computers",
+    "name": "Owned: Route all sessions to computers (Required: sessions)",
     "category": "Owned",
     "queryList": [
       {
