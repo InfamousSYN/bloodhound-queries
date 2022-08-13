@@ -1,23 +1,35 @@
 [{
-    "name": "Group: Find all enabled 'Enterprise Admins' Account Sessions",
+    "name": "Group: View all",
     "category": "Group",
     "queryList": [{
         "final": true,
-        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE g1.name STARTS WITH 'ENTERPRISE ADMIN' RETURN p ORDER BY c.name"
+        "query": "Match (g:Group) RETURN g"
     }]
 },{
-    "name": "Group: Find all enabled 'Domain Admins' Account Sessions",
+    "name": "Group: Find all computer sessions of enabled users with privileged group membership",
     "category": "Group",
     "queryList": [{
         "final": true,
-        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE g1.name STARTS WITH 'DOMAIN ADMIN' OR g1.objectid ENDS WITH '-512' RETURN p ORDER BY c.name"
+        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE (g.objectid ENDS WITH $domain_admins OR g.objectid ENDS WITH $enterprise_admins OR g.objectid ENDS WITH $administrators OR g.objectid ENDS WITH $account_operators) RETURN p ORDER BY c.name",
+        "props": {
+            "domain_admins": "-512",
+            "enterprise_admins": "-519",
+            "administrators": "-544",
+            "account_operators": "-548"
+        }
     }]
 },{
-    "name": "Group: Find all enabled SVC accounts with 'Domain Admins' Group membership",
+    "name": "Group: Find all enabled SVC accounts with privileged group membership",
     "category": "Group",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE g1.name STARTS WITH 'DOMAIN ADMIN' OR g1.objectid ENDS WITH '-512' AND u.name CONTAINS 'svc' RETURN p ORDERc.name"
+        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE (g.objectid ENDS WITH $domain_admins OR g.objectid ENDS WITH $enterprise_admins OR g.objectid ENDS WITH $administrators OR g.objectid ENDS WITH $account_operators) AND u.name CONTAINS 'svc' RETURN p ORDERc.name",
+        "props": {
+            "domain_admins": "-512",
+            "enterprise_admins": "-519",
+            "administrators": "-544",
+            "account_operators": "-548"
+        }
     }]
 },{
     "name": "Group: Find all 'Domain Users' Group memberships",
@@ -31,28 +43,28 @@
     "category": "Group",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETp ORDER BY g2.name"
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
     }]
 },{
     "name": "Group: Find all 'Domain Users' Group memberships with Dangerous Rights to enabled group->user",
     "category": "Group",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'DOMUSERS' RETURN p ORDER BY g2.name"
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
     }]
 },{
     "name": "Group: Find all 'Domain Users' Group memberships with Dangerous Rights group->group",
     "category": "Group",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'DOMAIN USERETURN p ORDER BY g2.name"
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
     }]
 },{
     "name": "Group: Find all Dangerous Rights 'Domain Users' group->computer",
     "category": "Group",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'DOMAIN USERETURN p ORDER BY g2.name"
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
     }]
 },    {
     "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships",
@@ -66,28 +78,28 @@
     "category": "Group",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'AUTHENTICATED USERETURN p ORDER BY g2.name"
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
     }]
 },{
     "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships with Dangerous Rights to enabled group->user",
     "category": "Group",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS W'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
     }]
 },{
     "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships with Dangerous Rights group->group",
     "category": "Group",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'AUTHENTICAUSERS' RETURN p ORDER BY g2.name"
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
     }]
 },{
     "name": "Group: Find all Dangerous Rights 'AUTHENTICATED USERS' group->computer",
     "category": "Group",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'AUTHENTICAUSERS' RETURN p ORDER BY g2.name"
+            "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
     }]
 },{
     "name": "Group: [DANGEROUS!!!] Find all Dangerous Rights from any group->group",
@@ -111,14 +123,7 @@
         "query": "MATCH p=(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) RETURN p ORDER BY g1.name"
     }]
 },{
-    "name": "Group: View all",
-    "category": "Group",
-    "queryList": [{
-        "final": true,
-        "query": "Match (g:Group) RETURN g"
-    }]
-},{
-    "name": "Group: Find all with network shares",
+    "name": "Group: Find all groups with description to network shares",
     "category": "Group",
     "requireNodeSelect": true,
     "queryList": [{
@@ -127,7 +132,19 @@
         "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
     },{
         "final": true,
-        "query": "MATCH (n:Group {domain:$result}) WHERE n.description contains '\\' return n"
+        "query": "MATCH (n:Group {domain:$result}) WHERE (n.description contains '\\') return n"
+    }]
+},{
+    "name": "Group: Find all groups with description to non-SYSVOL network shares",
+    "category": "Group",
+    "requireNodeSelect": true,
+    "queryList": [{
+        "final": false,
+        "title": "Select source domain",
+        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+    },{
+        "final": true,
+        "query": "MATCH (n:Group {domain:$result}) WHERE (n.description contains '\\') and (not n.description contains 'SYSVOL') return n"
     }]
 },{
     "name": "Group: List all with 'Local Admin' rights",
@@ -146,6 +163,6 @@
     "category": "Group",
     "queryList": [{
         "final": true,
-        "query": "MATCH (m:Group) WHERE m.enabled=TRUE WITH m MATCH p=(m)-[r:AZGlobalAdmin*1..]->(n) RETURN p"
+        "query": "MATCH (m:Group) WHERE m.enabled=TRUE WITH m MATCH p=(m)-[:AZGlobalAdmin|AZPrivilegedAdminRole*1..]->(n) RETURN p"
     }]
 }]
