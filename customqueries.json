@@ -1341,7 +1341,18 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (azu:AZUser) RETURN azu",
+        "query": "MATCH (azu:AZUser {enabled:true}) RETURN azu",
+        "allowCollapse": true
+      }
+    ]
+  },
+  {
+    "name": "AAD: List all enabled Azure User's Azure Group membership",
+    "category": "AAD",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(azu:AZUser {enabled:true})-[MemberOf*1..]->(azg:AZGroup) RETURN p",
         "allowCollapse": true
       }
     ]
