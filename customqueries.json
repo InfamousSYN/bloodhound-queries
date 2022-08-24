@@ -1143,48 +1143,12 @@
     ]
   },
   {
-    "name": "Find all Certificate Templates",
-    "category": "Certificates",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' RETURN n"
-      }
-    ]
-  },
-  {
-    "name": "Find enabled Certificate Templates",
-    "category": "Certificates",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' and n.Enabled = true RETURN n"
-      }
-    ]
-  },
-  {
     "name": "Find Certificate Authorities",
     "category": "Certificates",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (n:GPO) WHERE n.type = 'Enrollment Service' RETURN n"
-      }
-    ]
-  },
-  {
-    "name": "Show Enrollment Rights for Certificate Template",
-    "category": "Certificates",
-    "queryList": [
-      {
-        "final": false,
-        "title": "Select a Certificate Template...",
-        "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' RETURN n.name"
-      },
-      {
-        "final": true,
-        "query": "MATCH p=(g)-[:Enroll|AutoEnroll]->(n:GPO {name:$result}) WHERE n.type = 'Certificate Template' return p",
-        "allowCollapse": false
+        "query": "MATCH (n:GPO {type:'Enrollment Service'}) RETURN n"
       }
     ]
   },
@@ -1195,11 +1159,47 @@
       {
         "final": false,
         "title": "Select a Certificate Authority...",
-        "query": "MATCH (n:GPO) WHERE n.type = 'Enrollment Service' RETURN n.name"
+        "query": "MATCH (n:GPO {type:'Enrollment Service'}) RETURN n.name"
       },
       {
         "final": true,
         "query": "MATCH p=(g)-[:ManageCa|ManageCertificates|Auditor|Operator|Read|Enroll]->(n:GPO {name:$result}) return p",
+        "allowCollapse": false
+      }
+    ]
+  },
+  {
+    "name": "Find all Certificate Templates",
+    "category": "Certificates",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (n:GPO {type:'Certificate Template'}) RETURN n"
+      }
+    ]
+  },
+  {
+    "name": "Find enabled Certificate Templates",
+    "category": "Certificates",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (n:GPO {Enabled:true, type:'Certificate Template'}) RETURN n"
+      }
+    ]
+  },
+  {
+    "name": "Show Enrollment Rights for Certificate Template",
+    "category": "Certificates",
+    "queryList": [
+      {
+        "final": false,
+        "title": "Select a Certificate Template...",
+        "query": "MATCH (n:GPO {type:'Certificate Template'})RETURN n.name"
+      },
+      {
+        "final": true,
+        "query": "MATCH p=(g)-[:Enroll|AutoEnroll]->(n:GPO {name:$result, type:'Certificate Template'}) return p",
         "allowCollapse": false
       }
     ]
@@ -1210,7 +1210,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' and n.`Enrollee Supplies Subject` = true and n.`Client Authentication` = true and n.`Enabled` = true    RETURN n"
+        "query": "MATCH (n:GPO {Enabled:true, type:'Certificate Template', `Enrollee Supplies Subject`:true, `Client Authentication`:true}) RETURN n"
       }
     ]
   },
@@ -1220,7 +1220,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO)) WHERE    g<>n and n.type = 'Certificate Template' and n.`Enrollee Supplies Subject` = true and n.`Client Authentication` = true and n.`Enabled` = treturn p"
+        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO {Enabled:true, type:'Certificate Template', `Enrollee Supplies Subject`:true, `Client Authentication`:true})) WHERE g<>n return p"
       }
     ]
   },
@@ -1230,7 +1230,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' and n.`Enabled` = true and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage`) RETURN n"
+        "query": "MATCH (n:GPO {Enabled:true, type:'Certificate Template'}) WHERE (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage`) RETURN n"
       }
     ]
   },
@@ -1240,7 +1240,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO)) WHERE    g<>n and n.type = 'Certificate Template' and n.`Enabled` = true and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usagreturn p"
+        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO {Enabled:true, type:'Certificate Template'})) WHERE g<>n and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage`) return p"
       }
     ]
   },
@@ -1250,7 +1250,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (n:GPO) WHERE n.type = 'Certificate Template' and n.`Enabled` = true and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage` or 'Certificate Request Agent' IN n.`Extended Key UsageRETURN n"
+        "query": "MATCH (n:GPO {Enabled:true, type:'Certificate Template'}) WHERE (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage` or 'Certificate Request Agent' IN n.`Extended Key Usage`) RETURN n"
       }
     ]
   },
@@ -1260,7 +1260,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO)) WHERE    g<>n and n.type = 'Certificate Template' and n.`Enabled` = true and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage`'Certificate Request Agent' IN n.`Extended Key Usage`) return p"
+        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO {Enabled:true, type:'Certificate Template'})) WHERE g<>n and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage`'Certificate Request Agent' IN n.`Extended Key Usage`) return p"
       }
     ]
   },
@@ -1270,7 +1270,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=shortestPath((g)-[:GenericAll|GenericWrite|Owns|WriteDacl|WriteOwner*1..]->(n:GPO)) WHERE   g<>n and n.type = 'Certificate Template' and n.`Enabled` = true RETURN p"
+        "query": "MATCH p=shortestPath((g)-[:GenericAll|GenericWrite|Owns|WriteDacl|WriteOwner*1..]->(n:GPO {Enabled:true, type:'Certificate Template'})) WHERE g<>n RETURN p"
       }
     ]
   },
@@ -1280,7 +1280,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=allShortestPaths((g {owned:true})-[r*1..]->(n:GPO)) WHERE g<>n and n.type = 'Certificate Template' and n.Enabled = true and NONE(x in relationships(p) WHERE type(x) = 'Enroll' or type(x) = 'AutoEnrolreturn p"
+        "query": "MATCH p=allShortestPaths((g {owned:true})-[r*1..]->(n:GPO {Enabled:true, type:'Certificate Template'})) WHERE g<>n and NONE(x in relationships(p) WHERE type(x) = 'Enroll' or type(x) = 'AutoEnroll') return p"
       }
     ]
   },
@@ -1290,7 +1290,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (n:GPO) WHERE n.type = 'Enrollment Service' and n.`User Specified SAN` = 'Enabled' RETURN n"
+        "query": "MATCH (n:GPO {Enabled:true, type:'Enrollment Service', `User Specified SAN`:Enabled}) RETURN n"
       }
     ]
   },
@@ -1300,7 +1300,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=shortestPath((g)-[r:GenericAll|GenericWrite|Owns|WriteDacl|WriteOwner|ManageCa|ManageCertificates*1..]->(n:GPO)) WHERE  g<>n and n.type = 'Enrollment Service' RETURN p"
+        "query": "MATCH p=shortestPath((g)-[r:GenericAll|GenericWrite|Owns|WriteDacl|WriteOwner|ManageCa|ManageCertificates*1..]->(n:GPO {Enabled:true, type:'Enrollment Service'})) WHERE  g<>n RETURN p"
       }
     ]
   },
@@ -1310,7 +1310,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO)) WHERE    g<>n and n.type = 'Enrollment Service' and NONE(x in relationships(p) WHERE type(x) = 'Enroll' or type(x) = 'AutoEnroll') RETURN p"
+        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO {Enabled:true, type:'Enrollment Service'})) WHERE g<>n and NONE(x in relationships(p) WHERE type(x) = 'Enroll' or type(x) = 'AutoEnroll') RETURN p"
       }
     ]
   },
@@ -1320,7 +1320,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (n:GPO) WHERE n.type = 'Enrollment Service' and n.`Web Enrollment` = 'Enabled' RETURN n"
+        "query": "MATCH (n:GPO {Enabled:true, type:'Enrollment Service', `Web Enrollment`:Enabled}) RETURN n"
       }
     ]
   },
