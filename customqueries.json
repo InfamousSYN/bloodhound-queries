@@ -634,7 +634,7 @@
       },
       {
         "final": true,
-        "query": "MATCH p=(u1:User {enabled:true, domain: $result})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u2:User) WHERE NOT uu2 RETURN p"
+        "query": "MATCH p=(u1:User {enabled:true, domain: $result})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u2:User) WHERE NOT u1<>u2 RETURN p"
       }
     ]
   },
