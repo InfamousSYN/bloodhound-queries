@@ -104,7 +104,7 @@
     "category": "Certificates",
     "queryList": [{
         "final": true,
-        "query": "MATCH (n:GPO {Enabled:true, type:'Enrollment Service', `User Specified SAN`:Enabled}) RETURN n"
+        "query": "MATCH (n:GPO {Enabled:true, type:'Enrollment Service', `User Specified SAN`:'Enabled'}) RETURN n"
     }]
 },{
     "name": "Shortest Paths to Vulnerable Certificate Authority Access Control (ESC7)",
@@ -125,6 +125,6 @@
     "category": "Certificates",
     "queryList": [{
         "final": true,
-        "query": "MATCH (n:GPO {Enabled:true, type:'Enrollment Service', `Web Enrollment`:Enabled}) RETURN n"
+        "query": "MATCH (n:GPO {Enabled:true, type:'Enrollment Service', `Web Enrollment`:'Enabled'}) RETURN n"
     }]
 }]
