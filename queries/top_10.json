@@ -19,7 +19,7 @@
     "category": "Top 10",
     "queryList": [{
         "final": true,
-            "query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MAp=(m)-[r:HasSession]->(n) RETURN p",
+            "query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)-[r:HasSession]->(n) RETURN p",
         "allowCollapse": true
     }]
 },{
@@ -27,7 +27,7 @@
     "category": "Top 10",
     "queryList": [{
         "final": true,                
-            "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[r:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain WITH u, count(r) as rel_count order by rel_count desc LIMIT 10 MAp=(c:Computer)-[r:HasSession]->(u) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
+            "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[r:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain WITH u, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(c:Computer)-[r:HasSession]->(u) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
         "allowCollapse": false
     }]
 }]
