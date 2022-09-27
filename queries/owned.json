@@ -71,14 +71,14 @@
     "category": "Owned",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(g2:GroRETURN p ORDER BY g1.name"
+            "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(g2:Group) RETURN p ORDER BY g1.name"
     }]
 },{
     "name": "Owned: Route owned user where group membership has dangerous rights over user",
     "category": "Owned",
     "queryList": [{
         "final": true,
-            "query": "MATCH p=(u1:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(u2:UsRETURN p ORDER BY g1.name"
+            "query": "MATCH p=(u1:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(u2:User) RETURN p ORDER BY g1.name"
     }]
 },{
     "name": "Owned: Route from owned user to all nodes with 'Unconstrained Delegation'",
