@@ -247,7 +247,7 @@
         "query": "Match (n:Group {domain:$result}) WHERE n.name CONTAINS \"CITRIX\" return n"
     }]
 },{
-    "name": "Domain: [NT] Find all with network shares per domain",
+    "name": "Domain: Find all with network shares per domain",
     "category": "Domain",
     "requireNodeSelect": true,
     "queryList": [{
@@ -256,7 +256,19 @@
         "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
     },{
         "final": true,
-        "query": "MATCH (u:User {domain: $result}) WHERE u.description contains \"\\\\\" return u"
+        "query": "MATCH (n {domain:$result}) where (any(prop in keys(n) where n[prop] contains '\\\\' and not n[prop] contains 'SYSVOL')) return n"
+    }]
+},{
+    "name": "Domain: Find all with network shares per domain, ignoring SYSVOL",
+    "category": "Domain",
+    "requireNodeSelect": true,
+    "queryList": [{
+        "final": false,
+        "title": "Select source domain",
+        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+    },{
+        "final": true,
+        "query": "MATCH (n {domain:$result}) where (any(prop in keys(n) where n[prop] contains '\\\\' and not n[prop] contains 'SYSVOL')) return n"
     }]
 },{
     "name": "Domain: Route user where group membership has dangerous rights over group per domain",
