@@ -1036,7 +1036,7 @@
       },
       {
         "final": true,
-        "query": "MATCH (n:Group {domain:$result}) WHERE (n.description contains \"\\\\\") return n"
+        "query": "MATCH (g:Group {domain:$result}) where (any(prop in keys(g) where g[prop] contains '\\\\')) return g"
       }
     ]
   },
@@ -1052,7 +1052,7 @@
       },
       {
         "final": true,
-        "query": "MATCH (n:Group {domain:$result}) WHERE (n.description contains \"\\\\\") and (not n.description contains \"SYSVOL\") return n"
+        "query": "MATCH (g:Group {domain:$result}) where (any(prop in keys(g) where g[prop] contains '\\\\' and not g[prop] contains 'SYSVOL')) return g"
       }
     ]
   },
