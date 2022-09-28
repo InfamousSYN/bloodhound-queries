@@ -132,7 +132,7 @@
         "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
     },{
         "final": true,
-        "query": "MATCH (n:Group {domain:$result}) WHERE (n.description contains \"\\\\\") return n"
+        "query": "MATCH (g:Group {domain:$result}) where (any(prop in keys(g) where g[prop] contains '\\\\')) return g"
     }]
 },{
     "name": "Group: Find all groups with description to non-SYSVOL network shares",
@@ -144,7 +144,7 @@
         "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
     },{
         "final": true,
-        "query": "MATCH (n:Group {domain:$result}) WHERE (n.description contains \"\\\\\") and (not n.description contains \"SYSVOL\") return n"
+        "query": "MATCH (g:Group {domain:$result}) where (any(prop in keys(g) where g[prop] contains '\\\\' and not g[prop] contains 'SYSVOL')) return g"
     }]
 },{
     "name": "Group: List all with 'Local Admin' rights",
