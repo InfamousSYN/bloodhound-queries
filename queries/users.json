@@ -122,11 +122,11 @@
         "query": "MATCH p=(u:User)-[r:CanRDP]->(c:Computer) RETURN p"
     }]
 },{
-    "name": "Users: [NT] Find all with network shares",
+    "name": "Users: Find all with network shares",
     "category": "Users",
     "queryList": [{
         "final": true,
-        "query": "MATCH (u:User) WHERE u.description contains \"\\\\\" return u"
+        "query": "MATCH (u:User) where (any(prop in keys(u) where u[prop] contains '\\\\')) return u"
     }]
 },{
     "name": "User: Route user where group membership has dangerous rights over group",
