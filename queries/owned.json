@@ -125,6 +125,13 @@
         "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
     }]
 },{
+    "name": "Owned: [DANGEROUS!!!] Find all from owned where group membership grants Dangerous Rights",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
+    }]
+},{
     "name": "Owned: Route all sessions to computers WITHOUT LAPS (Required: sessions)",
     "category": "Owned",
     "queryList": [{
