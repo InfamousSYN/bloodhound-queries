@@ -122,7 +122,7 @@
     "category": "Owned",
     "queryList": [{
         "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group) WITH collect([c, u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
     }]
 },{
     "name": "Owned: Route all sessions to computers WITHOUT LAPS (Required: sessions)",
