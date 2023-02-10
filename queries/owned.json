@@ -115,7 +115,7 @@
     "category": "Owned",
     "queryList": [{
         "final": true,
-        "query": "MATCH p=(u:User {owned:true})-[:MemberOf*1..]->(g:Group) WHERE g.description contains '\\' return p"
+        "query": "MATCH p=(u:User {owned:true})-[:MemberOf*1..]->(g:Group) where (any(prop in keys(g) where g[prop] contains '\\\\')) return p"
     }]
 },{
     "name": "Owned: [DANGEROUS!!!] Find all Dangerous Rights from owned",
