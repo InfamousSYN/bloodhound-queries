@@ -5,7 +5,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-RETURN p",
+        "query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-(n) RETURN p",
         "allowCollapse": true
       }
     ]
@@ -16,7 +16,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-RETURN p",
+        "query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-(n) RETURN p",
         "allowCollapse": true
       }
     ]
@@ -225,7 +225,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=(u:User {owned:true})-[:MemberOf*1..]->(g:Group) WHERE g.description contains '\\' return p"
+        "query": "MATCH p=(u:User {owned:true})-[:MemberOf*1..]->(g:Group) where (any(prop in keys(g) where g[prop] contains '\\\\')) return p"
       }
     ]
   },
@@ -235,7 +235,17 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group) WITH collect([c, u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
+      }
+    ]
+  },
+  {
+    "name": "Owned: [DANGEROUS!!!] Find all from owned where group membership grants Dangerous Rights",
+    "category": "Owned",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
       }
     ]
   },
@@ -405,7 +415,23 @@
       },
       {
         "final": true,
-        "query": "MATCH (u:User {domain: $result}) WHERE u.description<>\"\" return u"
+        "query": "MATCH (u:User {domain: $result}) WHERE u.description IS NOT null return u"
+      }
+    ]
+  },
+  {
+    "name": "Domain: Find all enabled with description field per domain",
+    "category": "Domain",
+    "requireNodeSelect": true,
+    "queryList": [
+      {
+        "final": false,
+        "title": "Select source domain",
+        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+      },
+      {
+        "final": true,
+        "query": "MATCH (u:User {domain: $result, enabled:true}) WHERE u.description IS NOT null return u"
       }
     ]
   },
@@ -660,7 +686,17 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (u:User) WHERE u.description<>\"\" return u"
+        "query": "MATCH (u:User) WHERE u.description IS NOT null return u"
+      }
+    ]
+  },
+  {
+    "name": "Users: Find all enabled with description field",
+    "category": "Users",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.description IS NOT null return u"
       }
     ]
   },
