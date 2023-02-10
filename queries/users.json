@@ -3,7 +3,7 @@
     "category": "Users",
     "queryList": [{
         "final": true,
-        "query": "MATCH (u:User) WHERE u.description<>\"\" return u"
+        "query": "MATCH (u:User) WHERE u.description IS NOT null return u"
     }]
 },{
     "name": "Users: Find all enabled kerberoastable targets",
