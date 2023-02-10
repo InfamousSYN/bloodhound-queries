@@ -6,6 +6,13 @@
         "query": "MATCH (u:User) WHERE u.description IS NOT null return u"
     }]
 },{
+    "name": "Users: Find all enabled with description field",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.description IS NOT null return u"
+    }]
+},{
     "name": "Users: Find all enabled kerberoastable targets",
     "category": "Users",
     "queryList": [{
