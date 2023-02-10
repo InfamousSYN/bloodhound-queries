@@ -230,12 +230,12 @@
     ]
   },
   {
-    "name": "Owned: Find all Dangerous Rights from owned",
+    "name": "Owned: [DANGEROUS!!!] Find all Dangerous Rights from owned",
     "category": "Owned",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=(u:User {owned:true})-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(c:Computer) RETURN p"
+        "query": "MATCH (c:Computer), (u1:User), (g:Group) WITH collect([c, u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
       }
     ]
   },
