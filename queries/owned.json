@@ -67,14 +67,28 @@
         "query": "MATCH (c:Computer {owned:true}) RETURN c ORDER BY c.name"
     }]
 },{
-    "name": "Owned: Find all group membership routes with dangerous rights over group",
+    "name": "Owned: [DANGEROUS!!!] Route all enabled owned Dangerous Rights to any node type",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
+    }]
+},{
+    "name": "Owned: [DANGEROUS!!!] Route all enabled owned where group membership grants Dangerous Rights to any node type",
+    "category": "Owned",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
+    }]
+},{
+    "name": "Owned: Route all enabled owned where group membership grants Dangerous Rights to group",
     "category": "Owned",
     "queryList": [{
         "final": true,
             "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(g2:Group) RETURN p ORDER BY g1.name"
     }]
 },{
-    "name": "Owned: Route owned user where group membership has dangerous rights over user",
+    "name": "Owned: Route all enabled owned where group membership grants Dangerous Rights to user",
     "category": "Owned",
     "queryList": [{
         "final": true,
@@ -116,20 +130,6 @@
     "queryList": [{
         "final": true,
         "query": "MATCH p=(u:User {owned:true})-[:MemberOf*1..]->(g:Group) where (any(prop in keys(g) where g[prop] contains '\\\\')) return p"
-    }]
-},{
-    "name": "Owned: [DANGEROUS!!!] Find all Dangerous Rights from owned",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
-    }]
-},{
-    "name": "Owned: [DANGEROUS!!!] Find all from owned where group membership grants Dangerous Rights",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
     }]
 },{
     "name": "Owned: Route all sessions to computers WITHOUT LAPS (Required: sessions)",
