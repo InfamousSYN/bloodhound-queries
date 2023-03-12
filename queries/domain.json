@@ -176,7 +176,7 @@
     "category": "Domain",
     "queryList": [{
         "final": true,
-        "query": "MATCH p=(u:User)-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
+        "query": "MATCH (u1:User), (g:Group) WITH collect([u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(nodes)-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
         }]
 },{
     "name": "Domain: List all with 'Local Admin' rights per domain",
@@ -188,7 +188,7 @@
         "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
     },{
         "final": true,
-        "query": "MATCH p=(u:User {domain: $result})-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
+        "query": "MATCH (u1:User), (g:Group) WITH collect([u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(nodes {domain: $result})-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
         }]
 },{
     "name": "Domain: Find all group and user nodes with 'CanRDP' rights to machines",
