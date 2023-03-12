@@ -30,4 +30,11 @@
         "final": true,
         "query": "MATCH p=(u:User)<-[r:HasSession]-(c:Computer {haslaps:false}) RETURN p ORDER BY c.name"
     }]
+},{
+    "name": "Computers: [DANGEROUS!!!] Route all Computers Dangerous Rights to any node type",
+    "category": "Computers",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(c2:Computer)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
+    }]
 }]
