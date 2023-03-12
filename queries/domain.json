@@ -268,7 +268,7 @@
         "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
     },{
         "final": true,
-        "query": "MATCH (n {domain:$result}) where (any(prop in keys(n) where n[prop] contains '\\\\' and not n[prop] contains 'SYSVOL')) return n"
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH (nodes {domain:$result}) where (any(prop in keys(nodes) where nodes[prop] contains '\\\\')) return nodes"
     }]
 },{
     "name": "Domain: Find all with network shares per domain, ignoring SYSVOL",
@@ -280,7 +280,7 @@
         "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
     },{
         "final": true,
-        "query": "MATCH (n {domain:$result}) where (any(prop in keys(n) where n[prop] contains '\\\\' and not n[prop] contains 'SYSVOL')) return n"
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH (nodes {domain:$result}) where (any(prop in keys(nodes) where nodes[prop] contains '\\\\' and not nodes[prop] contains 'SYSVOL')) return nodes"
     }]
 },{
     "name": "Domain: Route user where group membership has dangerous rights over group per domain",
