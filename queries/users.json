@@ -136,14 +136,21 @@
         "query": "MATCH (u:User) where (any(prop in keys(u) where u[prop] contains '\\\\')) return u"
     }]
 },{
-    "name": "User: Route user where group membership has dangerous rights over group",
+    "name": "User: [DANGEROUS!!!] Route all enabled users Dangerous Rights to any node type",
+    "category": "Users",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {enabled:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
+    }]
+},{
+    "name": "User: Route all enabled users where group membership has dangerous rights over group",
     "category": "Users",
     "queryList": [{
         "final": true,
         "query": "MATCH p=(u:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group) RETURN p"
     }]
 },{
-    "name": "User: Route user where group membership has dangerous rights over user",
+    "name": "User: Route all enabled users group membership has dangerous rights over user",
     "category": "Users",
     "queryList": [{
         "final": true,
