@@ -39,34 +39,41 @@
         "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
     }]
 },{
-    "name": "Group: Find all 'Domain Users' Group memberships with Dangerous Rights group->user",
+    "name": "Group: [DANGEROUS!!!] Route all Group Dangerous Rights to any node type",
+    "category": "Group",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
+    }]
+},{
+    "name": "Group: Route 'Domain Users' group membership grants Dangerous Rights to user node",
     "category": "Group",
     "queryList": [{
         "final": true,
         "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
     }]
 },{
-    "name": "Group: Find all 'Domain Users' Group memberships with Dangerous Rights to enabled group->user",
+    "name": "Group: Route 'Domain Users' group membership grants Dangerous Rights to enabled user node",
     "category": "Group",
     "queryList": [{
         "final": true,
         "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
     }]
 },{
-    "name": "Group: Find all 'Domain Users' Group memberships with Dangerous Rights group->group",
+    "name": "Group: Route 'Domain Users' group membership grants Dangerous Rights to group node",
     "category": "Group",
     "queryList": [{
         "final": true,
         "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
     }]
 },{
-    "name": "Group: Find all Dangerous Rights 'Domain Users' group->computer",
+    "name": "Group: Route 'Domain Users' group membership grants Dangerous Rights to computer node",
     "category": "Group",
     "queryList": [{
         "final": true,
         "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
     }]
-},    {
+},{
     "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships",
     "category": "Group",
     "queryList": [{
@@ -74,49 +81,56 @@
         "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
     }]
 },{
-    "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships with Dangerous Rights group->user",
+    "name": "Group: [DANGEROUS!!!] Route 'AUTHENTICATED USERS' Group Dangerous Rights to any node type",
+    "category": "Group",
+    "queryList": [{
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p  ORDER BY g2.name"
+    }]
+},{
+    "name": "Group: Route 'AUTHENTICATED USERS' group membership grants Dangerous Rights to user node",
     "category": "Group",
     "queryList": [{
         "final": true,
         "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
     }]
 },{
-    "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships with Dangerous Rights to enabled group->user",
+    "name": "Group: Route 'AUTHENTICATED USERS' Group memberships with Dangerous Rights to enabled user node",
     "category": "Group",
     "queryList": [{
         "final": true,
         "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
     }]
 },{
-    "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships with Dangerous Rights group->group",
+    "name": "Group: Route 'AUTHENTICATED USERS' group membership grants Dangerous Rights to group node",
     "category": "Group",
     "queryList": [{
         "final": true,
         "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
     }]
 },{
-    "name": "Group: Find all Dangerous Rights 'AUTHENTICATED USERS' group->computer",
+    "name": "Group: Route 'AUTHENTICATED USERS' group membership grants Dangerous Rights to computer node",
     "category": "Group",
     "queryList": [{
         "final": true,
             "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
     }]
 },{
-    "name": "Group: [DANGEROUS!!!] Find all Dangerous Rights from any group->group",
+    "name": "Group: [DANGEROUS!!!] Route all Dangerous Rights from any group to any group node",
     "category": "Group",
     "queryList": [{
         "final": true,
         "query": "MATCH p=(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group) RETURN p ORDER BY g1.name"
     }]
 },{
-    "name": "Group: [DANGEROUS!!!] Find all Dangerous Rights from any group->user",
+    "name": "Group: [DANGEROUS!!!] Route all Dangerous Rights from any group to any user node",
     "category": "Group",
     "queryList": [{
         "final": true,
         "query": "MATCH p=(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) RETURN p ORDER BY g1.name"
     }]
 },{
-    "name": "Group: [DANGEROUS!!!] Find all Dangerous Rights from any group->computer",
+    "name": "Group: [DANGEROUS!!!] Route all Dangerous Rights from any group to any computer node",
     "category": "Group",
     "queryList": [{
         "final": true,
