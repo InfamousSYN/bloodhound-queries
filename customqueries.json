@@ -505,7 +505,7 @@
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=(u:User)-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
+        "query": "MATCH (u1:User), (g:Group) WITH collect([u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(nodes)-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
       }
     ]
   },
@@ -521,23 +521,23 @@
       },
       {
         "final": true,
-        "query": "MATCH p=(u:User {domain: $result})-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
+        "query": "MATCH (u1:User), (g:Group) WITH collect([u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(nodes {domain: $result})-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
       }
     ]
   },
   {
-    "name": "Domain: Map all 'CanRDP' rights to machines",
+    "name": "Domain: Find all group and user nodes with 'CanRDP' rights to machines",
     "category": "Domain",
     "requireNodeSelect": true,
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=(m:User)-[r:CanRDP]->(c:Computer) RETURN p"
+        "query": "MATCH (u1:User), (g:Group) WITH collect([u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(nodes)-[r:CanRDP]->(c:Computer) RETURN p"
       }
     ]
   },
   {
-    "name": "Domain: Map all 'CanRDP' rights to machines per domain",
+    "name": "Domain: Find all group and user nodes with 'CanRDP' rights to machines per domain",
     "category": "Domain",
     "requireNodeSelect": true,
     "queryList": [
@@ -548,7 +548,7 @@
       },
       {
         "final": true,
-        "query": "MATCH p=(m:User {domain: $result})-[r:CanRDP]->(c:Computer) RETURN p"
+        "query": "MATCH (u1:User), (g:Group) WITH collect([u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(nodes {domain: $result})-[r:CanRDP]->(c:Computer) RETURN p"
       }
     ]
   },
@@ -628,7 +628,7 @@
       },
       {
         "final": true,
-        "query": "MATCH (n {domain:$result}) where (any(prop in keys(n) where n[prop] contains '\\\\' and not n[prop] contains 'SYSVOL')) return n"
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH (nodes {domain:$result}) where (any(prop in keys(nodes) where nodes[prop] contains '\\\\')) return nodes"
       }
     ]
   },
@@ -644,7 +644,7 @@
       },
       {
         "final": true,
-        "query": "MATCH (n {domain:$result}) where (any(prop in keys(n) where n[prop] contains '\\\\' and not n[prop] contains 'SYSVOL')) return n"
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH (nodes {domain:$result}) where (any(prop in keys(nodes) where nodes[prop] contains '\\\\' and not nodes[prop] contains 'SYSVOL')) return nodes"
       }
     ]
   },
@@ -677,6 +677,38 @@
       {
         "final": true,
         "query": "MATCH p=(u1:User {enabled:true, domain: $result})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u2:User) WHERE NOT u1<>u2 RETURN p"
+      }
+    ]
+  },
+  {
+    "name": "Domain: [DANGEROUS!!!] Route all enabled users Dangerous Rights to any node type, per domain",
+    "category": "Domain",
+    "requireNodeSelect": true,
+    "queryList": [
+      {
+        "final": false,
+        "title": "Select source domain",
+        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+      },
+      {
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(u2:User {enabled:true, domain:$result})-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->nodes return p"
+      }
+    ]
+  },
+  {
+    "name": "Domain: [DANGEROUS!!!] Route all groups Dangerous Rights to any node type, per domain",
+    "category": "Domain",
+    "requireNodeSelect": true,
+    "queryList": [
+      {
+        "final": false,
+        "title": "Select source domain",
+        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+      },
+      {
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(g2:Group {domain:$result})-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->nodes return p"
       }
     ]
   },
