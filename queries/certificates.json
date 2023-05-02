@@ -83,7 +83,7 @@
     "category": "Certificates",
     "queryList": [{
         "final": true,
-        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO {Enabled:true, type:'Certificate Template'})) WHERE g<>n and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage`'Certificate Request Agent' IN n.`Extended Key Usage`) return p"
+        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO {Enabled:true, type:'Certificate Template'})) WHERE g<>n and (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage` or 'Certificate Request Agent' IN n.`Extended Key Usage`) return p"
     }]
 },{
     "name": "Shortest Paths to Vulnerable Certificate Template Access Control (ESC4)",
@@ -104,27 +104,27 @@
     "category": "Certificates",
     "queryList": [{
         "final": true,
-        "query": "MATCH (n:GPO {Enabled:true, type:'Enrollment Service', `User Specified SAN`:'Enabled'}) RETURN n"
+        "query": "MATCH (n:GPO {type:'Enrollment Service', `User Specified SAN`:'Enabled'}) RETURN n"
     }]
 },{
     "name": "Shortest Paths to Vulnerable Certificate Authority Access Control (ESC7)",
     "category": "Certificates",
     "queryList": [{
         "final": true,
-        "query": "MATCH p=shortestPath((g)-[r:GenericAll|GenericWrite|Owns|WriteDacl|WriteOwner|ManageCa|ManageCertificates*1..]->(n:GPO {Enabled:true, type:'Enrollment Service'})) WHERE  g<>n RETURN p"
+        "query": "MATCH p=shortestPath((g)-[r:GenericAll|GenericWrite|Owns|WriteDacl|WriteOwner|ManageCa|ManageCertificates*1..]->(n:GPO {type:'Enrollment Service'})) WHERE  g<>n RETURN p"
     }]
 },{
     "name": "Shortest Paths to Vulnerable Certificate Authority Access Control from Owned Principals (ESC7)",
     "category": "Certificates",
     "queryList": [{
         "final": true,
-        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO {Enabled:true, type:'Enrollment Service'})) WHERE g<>n and NONE(x in relationships(p) WHERE type(x) = 'Enroll' or type(x) = 'AutoEnroll') RETURN p"
+        "query": "MATCH p=allShortestPaths((g {owned:true})-[*1..]->(n:GPO {type:'Enrollment Service'})) WHERE g<>n and NONE(x in relationships(p) WHERE type(x) = 'Enroll' or type(x) = 'AutoEnroll') RETURN p"
     }]
 },{
     "name": "Find Certificate Authorities with HTTP Web Enrollment (ESC8)",
     "category": "Certificates",
     "queryList": [{
         "final": true,
-        "query": "MATCH (n:GPO {Enabled:true, type:'Enrollment Service', `Web Enrollment`:'Enabled'}) RETURN n"
+        "query": "MATCH (n:GPO {type:'Enrollment Service', `Web Enrollment`:'Enabled'}) RETURN n"
     }]
 }]
