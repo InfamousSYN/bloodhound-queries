@@ -713,17 +713,77 @@
     ]
   },
   {
-    "name": "Users: Find all with description field",
-    "category": "Users",
+    "name": "Users: List enabled users with password never expires",
+    "category": "Users Metadata",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (u:User) WHERE u.description IS NOT null return u"
+        "query": "MATCH (u:User {pwdneverexpires:true, enabled:true}) return u"
       }
     ]
   },
   {
-    "name": "Users: Find all enabled with description field",
+    "name": "Users: List enabled usersthat logged in within the last 90 days",
+    "category": "Users Metadata",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.lastlogon < (datetime().epochseconds - (90 * 86400)) and NOT u.lastlogon IN [-1.0, 0.0] RETURN u"
+      }
+    ]
+  },
+  {
+    "name": "Users: List enabled users passwords last set within the last 90 days",
+    "category": "Users Metadata",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.pwdlastset < (datetime().epochseconds - (90 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] RETURN u"
+      }
+    ]
+  },
+  {
+    "name": "Users: List enabled users never logged on but still active",
+    "category": "Users Metadata",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.lastlogontimestamp=-1.0 RETURN u"
+      }
+    ]
+  },
+  {
+    "name": "Users: List enabled users with password never expires and not changed in last 365 days",
+    "category": "Users Metadata",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) WHERE u.pwdneverexpires=TRUE AND u.pwdlastset < (datetime().epochseconds - (365 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] return u"
+      }
+    ]
+  },
+  {
+    "name": "Users: Find all with network shares",
+    "category": "Users Metadata",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (u:User) where (any(prop in keys(u) where u[prop] contains '\\\\')) return u"
+      }
+    ]
+  },
+  {
+    "name": "Users: List enabled users",
+    "category": "Users",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (u:User {enabled:true}) RETURN u"
+      }
+    ]
+  },
+  {
+    "name": "Users: Find enabled users with description field",
     "category": "Users",
     "queryList": [
       {
@@ -733,40 +793,37 @@
     ]
   },
   {
-    "name": "Users: Find all enabled kerberoastable targets",
+    "name": "Users: List enabled users with an email address",
     "category": "Users",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (u:User {hasspn: true, enabled:true}) RETURN u",
-        "allowCollapse": false
+        "query": "MATCH (u:User {enabled:true}) WHERE exists(u.email) RETURN u"
       }
     ]
   },
   {
-    "name": "Users: Route enabled kerberoastable targets to 'Local Admins' rights to machines",
+    "name": "Users: Find enabled users where the \"userpassword\" attribute is populated",
     "category": "Users",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=(u1:User {hasspn: true, enabled:true})-[r1:AdminTo]->(c:Computer) RETURN p",
-        "allowCollapse": false
+        "query": "MATCH (u:User {enabled:true}) WHERE u.userpassword IS NOT null RETURN u"
       }
     ]
   },
   {
-    "name": "Users: Route enabled kerberoastable targets to 'Local Admins' rights to machines with active user sessions",
+    "name": "Users: Find enabled users that don't require passwords",
     "category": "Users",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=(u1:User {hasspn: true, enabled:true})-[r1:AdminTo]->(c:Computer)<-[r2:HasSession]-(u2:User) RETURN p",
-        "allowCollapse": false
+        "query": "MATCH (u:User {passwordnotreqd:true, enabled:true}) return u"
       }
     ]
   },
   {
-    "name": "Users: Find all enabled AS-REP Roasting targets",
+    "name": "Users: Find enabled users AS-REP Roasting targets",
     "category": "Users",
     "queryList": [
       {
@@ -777,97 +834,18 @@
     ]
   },
   {
-    "name": "Users: List all enabled users with an email address",
+    "name": "Users: Find enabled users kerberoastable targets",
     "category": "Users",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (u:User {enabled:true}) WHERE exists(u.email) RETURN u"
+        "query": "MATCH (u:User {hasspn: true, enabled:true}) RETURN u",
+        "allowCollapse": false
       }
     ]
   },
   {
-    "name": "Users: Find all enabled users that don't require passwords",
-    "category": "Users",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (u:User {passwordnotreqd:true, enabled:true}) return u"
-      }
-    ]
-  },
-  {
-    "name": "Users: Find all where the \"userpassword\" attribute is populated",
-    "category": "Users",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (u:User {enabled:true}) WHERE u.userpassword IS NOT null RETURN u"
-      }
-    ]
-  },
-  {
-    "name": "Users: List all with password never expires",
-    "category": "Users",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (u:User {pwdneverexpires:true, enabled:true}) return u"
-      }
-    ]
-  },
-  {
-    "name": "Users: List all that logged in within the last 90 days",
-    "category": "Users",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (u:User {enabled:true}) WHERE u.lastlogon < (datetime().epochseconds - (90 * 86400)) and NOT u.lastlogon IN [-1.0, 0.0] RETURN u"
-      }
-    ]
-  },
-  {
-    "name": "Users: List all passwords last set within the last 90 days",
-    "category": "Users",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (u:User {enabled:true}) WHERE u.pwdlastset < (datetime().epochseconds - (90 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] RETURN u"
-      }
-    ]
-  },
-  {
-    "name": "Users: List all never logged on but still active",
-    "category": "Users",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (u:User {enabled:true}) WHERE u.lastlogontimestamp=-1.0 RETURN u"
-      }
-    ]
-  },
-  {
-    "name": "Users: List all enabled users",
-    "category": "Users",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (u:User {enabled:true}) RETURN u"
-      }
-    ]
-  },
-  {
-    "name": "Users: List all with password never expires and not changed in last 365 days",
-    "category": "Users",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (u:User {enabled:true}) WHERE u.pwdneverexpires=TRUE AND u.pwdlastset < (datetime().epochseconds - (365 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] return u"
-      }
-    ]
-  },
-  {
-    "name": "Users: List all enabled users with 'Local Admin' rights",
+    "name": "Users: List enabled users with 'Local Admin' rights",
     "category": "Users",
     "queryList": [
       {
@@ -877,38 +855,48 @@
     ]
   },
   {
-    "name": "Users: List all enabled users with 'Local Admin' rights to computer with active sessions",
+    "name": "Users: List enabled users with 'Local Admin' rights to computer, any active sessions",
     "category": "Users",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=(u1:User {enabled:true})-[r1:AdminTo]->(c:Computer)<-[r2:HasSession]-(u2:User) RETURN p"
+        "query": "MATCH p=(u1:User {enabled:true})-[r1:AdminTo]->(c:Computer)<-[r2:HasSession]-(:User)-[:MemberOf*1..]->(:Group) RETURN p"
       }
     ]
   },
   {
-    "name": "Users: Map all 'CanRDP' rights to machines",
+    "name": "Users: List enabled users with 'CanRDP' rights to machines",
     "category": "Users",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH p=(u:User)-[r:CanRDP]->(c:Computer) RETURN p"
+        "query": "MATCH p=(u:User {enabled:true})-[r:CanRDP]->(c:Computer) RETURN p"
       }
     ]
   },
   {
-    "name": "Users: Find all with network shares",
-    "category": "Users",
+    "name": "User: List enabled user paths with dangerous rights over group",
+    "category": "Users Paths",
     "queryList": [
       {
         "final": true,
-        "query": "MATCH (u:User) where (any(prop in keys(u) where u[prop] contains '\\\\')) return u"
+        "query": "MATCH p=(u:User {enabled:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(:Group) RETURN p"
       }
     ]
   },
   {
-    "name": "User: [DANGEROUS!!!] Route all enabled users Dangerous Rights to any node type",
-    "category": "Users",
+    "name": "User: List enabled user paths with dangerous rights over user",
+    "category": "Users Paths",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(u1:User {enabled:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u2:User) WHERE NOT u1 = u2 RETURN p"
+      }
+    ]
+  },
+  {
+    "name": "User: [NT][DANGEROUS!!!] List enabled user paths with dangerous rights to any node type",
+    "category": "Users Paths",
     "queryList": [
       {
         "final": true,
@@ -917,28 +905,8 @@
     ]
   },
   {
-    "name": "User: Route all enabled users where group membership has dangerous rights over group",
-    "category": "Users",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(u:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group) RETURN p"
-      }
-    ]
-  },
-  {
-    "name": "User: Route all enabled users group membership has dangerous rights over user",
-    "category": "Users",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(u1:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u2:User) WHERE NOT u1 = u2 RETURN p"
-      }
-    ]
-  },
-  {
-    "name": "Users: [NT][TBC] route to AAD:AZGlobalAdmin",
-    "category": "Users",
+    "name": "Users: [NT][TBC] List enabled user paths to AAD:AZGlobalAdmin",
+    "category": "Users Paths",
     "queryList": [
       {
         "final": true,
@@ -948,7 +916,7 @@
   },
   {
     "name": "Group: View all",
-    "category": "Group",
+    "category": "Group Metadata",
     "queryList": [
       {
         "final": true,
@@ -957,40 +925,8 @@
     ]
   },
   {
-    "name": "Group: Find all computer sessions of enabled users with privileged group membership",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE (g1.objectid ENDS WITH $domain_admins OR g1.objectid ENDS WITH $enterprise_admins OR g1.objectid ENDS WITH $administrators OR g1.objectid ENDS WITH $account_operators) RETURN p ORDER BY c.name",
-        "props": {
-          "domain_admins": "-512",
-          "enterprise_admins": "-519",
-          "administrators": "-544",
-          "account_operators": "-548"
-        }
-      }
-    ]
-  },
-  {
-    "name": "Group: Find all enabled SVC accounts with privileged group membership",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE (g1.objectid ENDS WITH $domain_admins OR g1.objectid ENDS WITH $enterprise_admins OR g1.objectid ENDS WITH $administrators OR g1.objectid ENDS WITH $account_operators) AND u.name CONTAINS 'svc' RETURN p ORDER BY c.name",
-        "props": {
-          "domain_admins": "-512",
-          "enterprise_admins": "-519",
-          "administrators": "-544",
-          "account_operators": "-548"
-        }
-      }
-    ]
-  },
-  {
     "name": "Group: Find all 'Domain Users' Group memberships",
-    "category": "Group",
+    "category": "Group Metadata",
     "queryList": [
       {
         "final": true,
@@ -999,58 +935,8 @@
     ]
   },
   {
-    "name": "Group: [DANGEROUS!!!] Route all Group Dangerous Rights to any node type",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
-      }
-    ]
-  },
-  {
-    "name": "Group: Route 'Domain Users' group membership grants Dangerous Rights to user node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
-      }
-    ]
-  },
-  {
-    "name": "Group: Route 'Domain Users' group membership grants Dangerous Rights to enabled user node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
-      }
-    ]
-  },
-  {
-    "name": "Group: Route 'Domain Users' group membership grants Dangerous Rights to group node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
-      }
-    ]
-  },
-  {
-    "name": "Group: Route 'Domain Users' group membership grants Dangerous Rights to computer node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
-      }
-    ]
-  },
-  {
     "name": "Group: Find all 'AUTHENTICATED USERS' Group memberships",
-    "category": "Group",
+    "category": "Group Metadata",
     "queryList": [
       {
         "final": true,
@@ -1059,88 +945,8 @@
     ]
   },
   {
-    "name": "Group: [DANGEROUS!!!] Route 'AUTHENTICATED USERS' Group Dangerous Rights to any node type",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p  ORDER BY g2.name"
-      }
-    ]
-  },
-  {
-    "name": "Group: Route 'AUTHENTICATED USERS' group membership grants Dangerous Rights to user node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
-      }
-    ]
-  },
-  {
-    "name": "Group: Route 'AUTHENTICATED USERS' Group memberships with Dangerous Rights to enabled user node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
-      }
-    ]
-  },
-  {
-    "name": "Group: Route 'AUTHENTICATED USERS' group membership grants Dangerous Rights to group node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
-      }
-    ]
-  },
-  {
-    "name": "Group: Route 'AUTHENTICATED USERS' group membership grants Dangerous Rights to computer node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
-      }
-    ]
-  },
-  {
-    "name": "Group: [DANGEROUS!!!] Route all Dangerous Rights from any group to any group node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group) RETURN p ORDER BY g1.name"
-      }
-    ]
-  },
-  {
-    "name": "Group: [DANGEROUS!!!] Route all Dangerous Rights from any group to any user node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) RETURN p ORDER BY g1.name"
-      }
-    ]
-  },
-  {
-    "name": "Group: [DANGEROUS!!!] Route all Dangerous Rights from any group to any computer node",
-    "category": "Group",
-    "queryList": [
-      {
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) RETURN p ORDER BY g1.name"
-      }
-    ]
-  },
-  {
     "name": "Group: Find all groups with description to network shares",
-    "category": "Group",
+    "category": "Group Metadata",
     "requireNodeSelect": true,
     "queryList": [
       {
@@ -1156,7 +962,7 @@
   },
   {
     "name": "Group: Find all groups with description to non-SYSVOL network shares",
-    "category": "Group",
+    "category": "Group Metadata",
     "requireNodeSelect": true,
     "queryList": [
       {
@@ -1171,7 +977,107 @@
     ]
   },
   {
-    "name": "Group: List all with 'Local Admin' rights",
+    "name": "Group: List 'Domain Users' group membership paths Dangerous Rights to user node",
+    "category": "Domain User Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: List 'Domain Users' group membership paths Dangerous Rights to enabled user node",
+    "category": "Domain User Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: List 'Domain Users' group membership paths Dangerous Rights to group node",
+    "category": "Domain User Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: List 'Domain Users' group membership paths Dangerous Rights to computer node",
+    "category": "Domain User Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: [DANGEROUS!!!] List 'Domain User' group membership paths Dangerous Rights to any node type",
+    "category": "Domain User Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p"
+      }
+    ]
+  },
+  {
+    "name": "Group: List 'AUTHENTICATED USERS' group membership paths Dangerous Rights to user node",
+    "category": "Authenticated User Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: List 'AUTHENTICATED USERS' group membership paths Dangerous Rights to enabled user node",
+    "category": "Authenticated User Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: List 'AUTHENTICATED USERS' group membership paths Dangerous Rights to group node",
+    "category": "Authenticated User Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: List 'AUTHENTICATED USERS' group membership paths Dangerous Rights to computer node",
+    "category": "Authenticated User Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: [DANGEROUS!!!] List 'AUTHENTICATED USERS' group membership paths Dangerous Rights to any node type",
+    "category": "Authenticated User Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p"
+      }
+    ]
+  },
+  {
+    "name": "Group: List all groups with 'Local Admin' rights, any active sessions",
     "category": "Group",
     "requireNodeSelect": true,
     "queryList": [
@@ -1182,7 +1088,47 @@
       },
       {
         "final": true,
-        "query": "MATCH p=(m:Group {domain:$result})-[r:AdminTo]->(n:Computer) RETURN p ORDER BY m.name"
+        "query": "MATCH p=(m:Group {domain:$result})-[r:AdminTo]->(n:Computer)<-[r2:HasSession]-(:User)-[:MemberOf*1..]->(:Group) RETURN p ORDER BY m.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: List all group membership paths Dangerous Rights to user node",
+    "category": "Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User) RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: List all group membership paths Dangerous Rights to enabled user node",
+    "category": "Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u:User {enabled:true}) RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: List all group membership paths Dangerous Rights to group node",
+    "category": "Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g3:Group) RETURN p ORDER BY g2.name"
+      }
+    ]
+  },
+  {
+    "name": "Group: List all group membership paths Dangerous Rights to computer node",
+    "category": "Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(c:Computer)RETURN p ORDER BY g2.name"
       }
     ]
   },
@@ -1193,6 +1139,86 @@
       {
         "final": true,
         "query": "MATCH (m:Group) WHERE m.enabled=TRUE WITH m MATCH p=(m)-[:AZGlobalAdmin|AZPrivilegedAdminRole*1..]->(n) RETURN p"
+      }
+    ]
+  },
+  {
+    "name": "Group: Route all enabled users with non-privileged group membership has dangerous rights over user",
+    "category": "Non-privileged Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(u1:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u2:User) WHERE NOT u1 = u2 AND NOT (g1.objectid =~ $domain_admins or g1.objectid =~ $enterprise_admins or g1.objectid =~ $administrators or g1.objectid =~ $account_operators) RETURN p",
+        "props": {
+          "domain_admins": "(?i)S-1-5-.*-512",
+          "enterprise_admins": "(?i)S-1-5-.*-519",
+          "administrators": "(?i)S-1-5-.*-544",
+          "account_operators": "(?i)S-1-5-.*-548"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Group: Route all enabled users with non-privileged group membership has dangerous rights over group",
+    "category": "Non-privileged Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(u1:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(:Group) WHERE NOT (g1.objectid =~ $domain_admins or g1.objectid =~ $enterprise_admins or g1.objectid =~ $administrators or g1.objectid =~ $account_operators) RETURN p",
+        "props": {
+          "domain_admins": "(?i)S-1-5-.*-512",
+          "enterprise_admins": "(?i)S-1-5-.*-519",
+          "administrators": "(?i)S-1-5-.*-544",
+          "account_operators": "(?i)S-1-5-.*-548"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Group: Route all enabled users with non-privileged group membership has dangerous rights over computer",
+    "category": "Non-privileged Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(u1:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(:Computer) WHERE NOT (g1.objectid =~ $domain_admins or g1.objectid =~ $enterprise_admins or g1.objectid =~ $administrators or g1.objectid =~ $account_operators) RETURN p",
+        "props": {
+          "domain_admins": "(?i)S-1-5-.*-512",
+          "enterprise_admins": "(?i)S-1-5-.*-519",
+          "administrators": "(?i)S-1-5-.*-544",
+          "account_operators": "(?i)S-1-5-.*-548"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Group: Find all enabled SVC accounts with privileged group membership",
+    "category": "Privileged Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE (g1.objectid =~ $domain_admins OR g1.objectid =~ $enterprise_admins OR g1.objectid =~ $administrators OR g1.objectid =~ $account_operators) AND u.name CONTAINS 'svc' RETURN p ORDER BY c.name",
+        "props": {
+          "domain_admins": "(?i)S-1-5-.*-512",
+          "enterprise_admins": "(?i)S-1-5-.*-519",
+          "administrators": "(?i)S-1-5-.*-544",
+          "account_operators": "(?i)S-1-5-.*-548"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Group: Find all computer sessions of enabled users with privileged group membership",
+    "category": "Privileged Group",
+    "queryList": [
+      {
+        "final": true,
+        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE (g1.objectid =~ $domain_admins OR g1.objectid =~ $enterprise_admins OR g1.objectid =~ $administrators OR g1.objectid =~ $account_operators) RETURN p ORDER BY c.name",
+        "props": {
+          "domain_admins": "-512",
+          "enterprise_admins": "-519",
+          "administrators": "-544",
+          "account_operators": "-548"
+        }
       }
     ]
   },
