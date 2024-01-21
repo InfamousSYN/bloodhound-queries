@@ -1,0 +1,75 @@
+[
+    {
+      "name": "List privileged user(s) without \"Protected Users\" group membership",
+      "category": "Privileged",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {admincount:true, domain: $result}), (c:Computer), (u)-[:MemberOf*1..]->(g) WHERE g.name CONTAINS 'Protected Users' WITH COLLECT(u) AS privilegedUsers MATCH (u2:User {admincount:true}) WHERE NOT u2 IN privilegedUsers RETURN u2"
+        }
+      ]
+    },
+    {
+      "name": "List custom privileged group(s)",
+      "category": "Privileged",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (g:Group {admincount:true, highvalue:false, domain: $result}) WHERE NOT (g.objectid =~ $domain_admins or g.objectid =~ $enterprise_admins or g.objectid =~ $administrators or g.objectid =~ $account_operators or g.objectid CONTAINS $replicators or g.objectid =~ $key_admins or g.objectid =~ $read_only_domain_controllers or g.objectid =~ $enterprise_key_admins or g.objectid =~ $schema_admins) RETURN g",
+          "props": {
+              "domain_admins": "(?i)S-1-5-.*-512",
+              "enterprise_admins": "(?i)S-1-5-.*-519",
+              "administrators": "(?i)S-1-5-.*-544",
+              "account_operators": "(?i)S-1-5-.*-548",
+              "replicators": "-552",
+              "key_admins": "(?i)S-1-5-.*-526",
+              "read_only_domain_controllers": "(?i)S-1-5-.*-521",
+              "enterprise_key_admins": "(?i)S-1-5-.*-527",
+              "schema_admins": "(?i)S-1-5-.*-518"
+          }
+        }
+      ]
+    },
+    {
+      "name":"List all enabled SVC account(s) with privileged group membership(s)",
+      "category": "Privileged",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {enabled: true, hasspn: true, domain: $result})-[:MemberOf*1..]->(g:Group {admincount: true}) RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name":"Route all privileged user(s) with sessions to non-privileged computer(s) [Required: sessions]",
+      "category": "Privileged",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (c:Computer), (u:User), (g:Group), (c)-[:MemberOf*1..]->(:Group {admincount:false}) MATCH p=(c)-[:HasSession]->(u {admincount:true, domain: $result}) RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    }
+]

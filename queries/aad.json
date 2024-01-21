@@ -1,185 +1,134 @@
-[{
-    "name": "AAD: Find all Tenancy",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (p:AZTenant) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: Find all enabled Azure Users",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (azu:AZUser {enabled:true}) RETURN azu",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: List all enabled Azure User's Azure Group membership",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(azu:AZUser {enabled:true})-[MemberOf*1..]->(azg:AZGroup) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: Find all nodes with privileged access to Azure Tenancy",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(a)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: Find all on-premise users with privileged access to Azure Tenancy",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u:User)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: Find all on-premise groups with privileged access to Azure Tenancy",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(g:Group)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: Find all nodes that have control of Azure Applications that run as Service Principals privileged access to Azure Tenancy",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(a)-[:AZOwns|AZAppAdmin]->(azapp:AZApp)-[:AZRunsAs]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [NT] Find all all nodes that have control a node that run as Service Principals privileged access to Azure Tenancy",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(a)-[:AZOwns|AZAppAdmin]->(b)-[:AZRunsAs]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [NT] Find all nodes that run as Service Principals privileged access to Azure Tenancy",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(a)-[:AZRunsAs]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [NT][DANAGEROUR!!!] Find all rights of nodes that run as Service Principals privileged across the tenancy",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(a)-[:AZRunsAs]->(azsp:AZServicePrincipal)-[r]->(b) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [LEGACY] Find all on-premise users owners of Azure Applications",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p = (u:User {enabled:true})-[r:AZOwns]->(g:AZApp) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [LEGACY] Find all Azure Users owners of Azure Applications",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p = (azu:AZUser {enabled:true})-[r:AZOwns]->(g:AZApp) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [LEGACY] Find all on-premise group owners of Azure Applications",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p = (g:Group {enabled:true})-[r:AZOwns]->(g:AZApp) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [LEGACY] Find all Azure Groups owners of Azure Applications",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p = (azg:AZGroup {enabled:true})-[r:AZOwns]->(g:AZApp) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [LEGACY][NT] All On-Prem users with edges to Azure",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(m:User)-[r:AZResetPassword|AZOwns|AZUserAccessAdministrator|AZContributor|AZAddMembers|AZGlobalAdmin|AZVMContributor|AZOwnsAZAvereContributor]->(n) WHERE m.objectid CONTAINS 'S-1-5-21' RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [LEGACY] Find all On-Premise User Owners of Azure Applications with Owners to Service Principals with Dangerous Rights",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u1:User)-[:AZOwns|AZAppAdmin]->(azapp:AZApp)-[:AZRunsAs]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [LEGACY] Find all On-Premise Group Owners of Azure Applications with Owners to Service Principals with Dangerous Rights",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(g1:Group)-[:AZOwns|AZAppAdmin]->(azapp:AZApp)-[:AZRunsAs]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [LEGACY] Find all On-Premise User Owners of Azure Applications with Owners to Service Principals with Dangerous Rights to tenancy where AZUser has rights to on-premise Users that have dangerous rights to a on-pgroup",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u1:User)-[:AZOwns|AZAppAdmin]->(azapp:AZApp)-[:AZRunsAs]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant)-[r3]->(azu:AZUser)-[r4]->(u2:User)-[r5:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|Allowedlegate|ForceChangePassword]->(g1:Group) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [LEGACY] Find all On-Premise User Owners of Azure Applications with Owners to Service Principals with Dangerous Rights to tenancy where AZUser has rights to enabled on-premise Users with that have dangerous grmembership rights to highvalued groups",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u1:User)-[:AZOwns|AZAppAdmin]->(azapp:AZApp)-[:AZRunsAs]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant)-[r3]->(azu:AZUser)-[r4]->(u2:U{enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group {highvalue:true}) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [LEGACY] Find all On-Premise User Owners of Azure Applications with Owners to Service Principals with Dangerous Rights to tenancy where AZUser has rights to enabled on-premise Users with that have dangerous grmembership rights to highvalued groups with rights to domain",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u1:User)-[:AZOwns|AZAppAdmin]->(azapp:AZApp)-[:AZRunsAs]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant)-[r3]->(azu:AZUser)-[r4]->(u2:U{enabled:true})-[:MemberOf*1..]->(g1:Group)-[r5:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group {highvalue:true})-[r6]->(d1:Domain) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: Find all On-Premise User Owners of Azure Applications with Owners to Service Principals with Dangerous Rights to tenancy where AZUser has rights to enabled on-premise Users with that have dangerous grmembership rights to highvalued groups with rights to domain including cross-domain routes",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u1:User)-[:AZOwns|AZAppAdmin]->(azapp:AZApp)-[:AZRunsAs]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant)-[r3]->(azu:AZUser)-[r4]->(u2:User {enabled:true})-[:MemberOf*1..]->(g1:Group)-[r5:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group {highvalue:true})-[r6]->(d1:Domain)-[r7]->(d2:Domain) WHnot d1 = d2 RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: All Azure AD Groups that are synchronized with On-Premise AD",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (n:Group) WHERE n.objectid CONTAINS 'S-1-5' AND n.azsyncid IS NOT NULL RETURN n",
-        "allowCollapse": true
-    }]
-},{
-    "name": "AAD: [NT] Find all paths to an Azure VM",
-    "category": "AAD",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p = (n)-[r]->(g:AZVM) RETURN p",
-        "allowCollapse": true
-    }]
-}]
+[
+    {
+      "name": "List all Tenancy (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH (t:AZTenant) RETURN t",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "[WIP] List all AAD Group(s) that are synchronized with AD (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH (n:Group) WHERE n.objectid CONTAINS 'S-1-5' AND n.azsyncid IS NOT NULL RETURN n",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "[WIP] List all principal(s) used for syncing AD and AAD",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH (u) WHERE (u:User OR u:AZUser) AND (u.name =~ '(?i)^MSOL_|.*AADConnect.*' OR u.userprincipalname =~ '(?i)^sync_.*') OPTIONAL MATCH (u)-[:HasSession]->(s:Session) RETURN u, s",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "List all enabled Azure User(s) (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH (u:AZUser {enabled:true}) RETURN u",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "List all enabled Azure User(s) Azure Group membership(s) (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH p=(azu:AZUser {enabled:true})-[MemberOf*1..]->(azg:AZGroup) RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "[WIP] List all AD principal(s) with edge(s) to Azure principal(s) (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH p=(u:User)-[r:MemberOf|AZResetPassword|AZOwns|AZUserAccessAdministrator|AZContributor|AZAddMembers|AZGlobalAdmin|AZVMContributor|AZOwnsAZAvereContributor*1..]->(n) WHERE u.objectid CONTAINS 'S-1-5-21' RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "[WIP] List all principal(s) with privileged access to Azure Tenancy (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH (a) WHERE (a:User OR a:AZUser) WITH a MATCH p=(a)-[r:MemberOf|AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "[WIP] Route all principal(s) that have control permissions to Azure Application(s) running as Azure Service Principals (AzSP), and route from privileged ASP to Azure Tenancy (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH (a) WHERE (a:User OR a:AZUser) WITH a MATCH p=(a)-[:MemberOf|AZOwns|AZAppAdmin*1..]->(azapp:AZApp) OPTIONAL MATCH p2=(azapp)-[:AZRunsAs]->(azsp:AZServicePrincipal) OPTION MATCH p3=(azsp)-[:MemberOf|AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p, p2, p3",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "[WIP] Route all user principal(s) that have control permissions to Azure Service Principals (AzSP), and route from AzSP to principal(s) (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH (a) WHERE (a:User OR a:AZUser) WITH a MATCH p=allShortestPaths((a)-[*]->(azsp:AZServicePrincipal)-[*]->(b)) WHERE NOT a=b RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "[WIP] Route from Azure User principal(s) that have dangerous rights to Azure User and User principal(s) (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH (a) WHERE (a:User OR a:AZUser) WITH a MATCH p=allShortestPaths((u:AZUser)-[*]->(a)) WHERE NOT a=u RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "[WIP] Route from principal(s) to Azure VM (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((a)-[*]->(vm:AZVM)) WHERE NOT a=vm RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "[WIP] Route from principal(s) to principal(s) with Global Administrator permissions (Required: azurehound)",
+      "category": "AAD",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH p=(ga)-[:AZGlobalAdmin|AZPrivilegedAdminRole*1..]->(:AZTenant) WHERE (ga:User OR ga:AZUser) WITH ga MATCH p=allshortestpaths((a)-[*]->(ga)) WHERE NOT a=ga RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    }
+]

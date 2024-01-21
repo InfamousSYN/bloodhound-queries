@@ -1,33 +1,98 @@
-[{
-    "name": "Top 10: Users with Most Local Admin Rights",
-    "category": "Top 10",
-    "queryList": [{
-        "final": true,
-            "query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-(n) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "Top 10: Computers with Most Sessions",
-    "category": "Top 10",
-    "queryList": [{
-        "final": true,
-            "query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-(n) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "Top 10: Users with Most Sessions",
-    "category": "Top 10",
-    "queryList": [{
-        "final": true,
-            "query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)-[r:HasSession]->(n) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "Top 10: Users with most cross-domain sessions",
-    "category": "Top 10",
-    "queryList": [{
-        "final": true,                
-            "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[r:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain WITH u, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(c:Computer)-[r:HasSession]->(u) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
-        "allowCollapse": false
-    }]
-}]
+[
+    {
+      "name": "[WIP] Users with Most Local Admin Rights",
+      "category": "Top 10",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:User {domain: $result}),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-(n) RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "[WIP] Computers with Most Sessions [Required: sessions]",
+      "category": "Top 10",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:User {domain: $result}),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-(n) RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "[WIP] Users with Most Sessions [Required: sessions]",
+      "category": "Top 10",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:User {domain: $result}),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)-[r:HasSession]->(n) RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "List non-privileged user(s) with dangerous permissions to any node type",
+      "category": "Top 10",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {enabled: true, admincount: false, domain: $result})-[r]->(a) RETURN u, COUNT(DISTINCT type(r)) AS permissions ORDER BY permissions DESC LIMIT 10",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged user(s) with dangerous permissions to any node type",
+      "category": "Top 10",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {enabled: true, admincount: false, domain: $result})-[r]->(a) WITH u, COUNT(DISTINCT type(r)) AS permissions ORDER BY permissions DESC LIMIT 10 MATCH p=allshortestpaths((u)-[r]->(a)) WHERE NOT u = a RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "[WIP] Users with most cross-domain sessions [Required: sessions]",
+      "category": "Top 10",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true, domain: $result})<-[r:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain WITH u, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(c:Computer)-[r:HasSession]->(u) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
+          "allowCollapse": false
+        }
+      ]
+    }
+]

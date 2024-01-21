@@ -1,0 +1,114 @@
+[
+    {
+      "name": "List enabled non-privileged user(s) with \"Local Admin\" permission",
+      "category": "Non-privileged",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {enabled: true, admincount: false, domain: $result})-[:MemberOf|AdminTo*1..]->(c:Computer) RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List enabled non-privileged user(s) with \"Local Admin\" permission, and any active sessions and their group membership(s)",
+      "category": "Non-privileged",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {enabled: true, admincount: false, domain: $result})-[:MemberOf|AdminTo*1..]->(c:Computer) OPTIONAL MATCH p2=(c)-[:HasSession]->(u2:User) OPTIONAL MATCH p3=(u2:User)-[:MemberOf*1..]->(:Group) RETURN p, p2, p3",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List enabled non-privileged user(s) with \"RDP\" permission",
+      "category": "Non-privileged",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {enabled: true, admincount: false, domain: $result})-[:MemberOf|CanRDP*1..]->(c:Computer) RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List enabled non-privileged user(s) with \"RDP\" permission, and any active sessions and their group membership(s)",
+      "category": "Non-privileged",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {enabled: true, admincount: false, domain: $result})-[:MemberOf|CanRDP*1..]->(c:Computer) OPTIONAL MATCH p2=(c)-[:HasSession]->(u2:User) OPTIONAL MATCH p3=(u2:User)-[:MemberOf*1..]->(:Group) RETURN p, p2, p3",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List enabled non-privileged user(s) with \"SQLAdmin\" permission",
+      "category": "Non-privileged",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {enabled: true, admincount: false, domain: $result})-[:MemberOf|SQLAdmin*1..]->(c:Computer) RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List all \"Domain Users\" group membership(s)",
+      "category": "Non-privileged",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(g1:Group {domain: $result})-[:MemberOf*1..]->(g2:Group) WHERE g1.name STARTS WITH 'DOMAIN USERS' RETURN p ORDER BY g2.name"
+        }
+      ]
+    },
+    {
+      "name": "List all \"Authenticated Users\" group membership(s)",
+      "category": "Non-privileged",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(g1:Group {domain: $result})-[:MemberOf*1..]->(g2:Group) WHERE g1.name STARTS WITH 'AUTHENTICATED USERS' RETURN p ORDER BY g2.name"
+        }
+      ]
+    }
+]

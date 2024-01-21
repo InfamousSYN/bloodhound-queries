@@ -1,333 +1,455 @@
-[{
-    "name": "Domain: Return Domain Object",
-    "category": "Domain",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (m:Domain) RETURN m",
-        "allowCollapse": true
-    }]
-},{
-    "name": "Domain: Find all sessions a user has in a specific domain per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain...",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,                
-        "query": "MATCH p=(u:User {domain: $result})<-[r:HasSession]-(c:Computer {domain: $result}) RETURN p ORDER BY c.name",
-        "allowCollapse": false
-    }]
-},{
-    "name": "Domain: Find all cross-domain sessions",
-    "category": "Domain",
-    "queryList": [{
-        "final": true,                
-        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true})<-[:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
-        "allowCollapse": false
-    }]
-},{
-    "name": "Domain: Find all cross-domain sessions per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain...",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,                
-        "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true, domain:$result})<-[:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
-        "allowCollapse": false
-    }]
-},{
-    "name": "Domain: Find all enabled kerberoastable targets per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain...",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,                
-        "query": "MATCH (u:User {hasspn: true, enabled:true, domain:$result}) RETURN u",
-        "allowCollapse": false
-    }]
-},{
-    "name": "Domain: Find all enabled AS-REP Roasting targets per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain...",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,                
-        "query": "MATCH (u:User {dontreqpreauth: true, domain:$result, enabled:true}) RETURN u",
-        "allowCollapse": false
-    }]
-},{
-    "name": "Domain: Find all nodes with 'Unconstrained Delegation'",
-    "category": "Domain",
-    "queryList": [{
-        "final": true,                
-        "query": "MATCH (o {unconstraineddelegation: true, enabled: true}) RETURN o",
-        "allowCollapse": false
-    }]
-},{
-    "name": "Domain: Find all nodes with 'Unconstrained Delegation' per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain...",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,                
-        "query": "MATCH (o {unconstraineddelegation: true, enabled: true, domain:$result}) RETURN o",
-        "allowCollapse": false
-    }]
-},{
-    "name": "Domain: List all enabled users per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (u:User {enabled:true, domain: $result}) RETURN u"
-    }]
-},{
-    "name": "Domain: Find all with description field per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (u:User {domain: $result}) WHERE u.description IS NOT null return u"
-    }]
-},{
-    "name": "Domain: Find all enabled with description field per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (u:User {domain: $result, enabled:true}) WHERE u.description IS NOT null return u"
-    }]
-},{
-    "name": "Domain: Find all enabled users that don't require passwords per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (u:User {passwordnotreqd:true, enabled:true, domain: $result}) return u"
-    }]
-},{
-    "name": "Domain: Find all where the \"userpassword\" attribute is populated per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (u:User {enabled:true, domain: $result}) WHERE u.userpassword IS NOT null RETURN u"
-    }]
-},{
-    "name": "Domain: List all with password never expires per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (u:User {pwdneverexpires:true, enabled:true, domain: $result}) return u"
-    }]
-},{
-    "name": "Domain: List all with password never expires and not changed in last 365 days per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (u:User {enabled:true, domain: $result}) WHERE u.pwdneverexpires=TRUE AND u.pwdlastset < (datetime().epochseconds - (365 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] return u"
-    }]
-},{
-    "name": "Domain: List all with 'Local Admin' rights",
-    "category": "Domain",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (u1:User), (g:Group) WITH collect([u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(nodes)-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
-        }]
-},{
-    "name": "Domain: List all with 'Local Admin' rights per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (u1:User), (g:Group) WITH collect([u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(nodes {domain: $result})-[r:AdminTo]->(c:Computer) WHERE NOT u.name STARTS WITH 'ANONYMOUS LOGON' AND NOT u.name='' RETURN p"
-        }]
-},{
-    "name": "Domain: Find all group and user nodes with 'CanRDP' rights to machines",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (u1:User), (g:Group) WITH collect([u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(nodes)-[r:CanRDP]->(c:Computer) RETURN p"
-    }]
-},{
-    "name": "Domain: Find all group and user nodes with 'CanRDP' rights to machines per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (u1:User), (g:Group) WITH collect([u1, g]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(nodes {domain: $result})-[r:CanRDP]->(c:Computer) RETURN p"
-    }]
-},{
-    "name": "Domain: List all computers WITHOUT LAPS",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (c:Computer {haslaps:false, domain: $result}) RETURN c ORDER BY c.name"
-    }]
-},{
-    "name": "Domain: Find all groups that contain keyword 'admin'",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "Match (n:Group {domain:$result}) WHERE n.name CONTAINS \"ADMIN\" return n"
-    }]
-},{
-    "name": "Domain: Find all groups that contain keyword 'sql'",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "Match (n:Group {domain:$result}) WHERE n.name CONTAINS \"SQL\" return n"
-    }]
-},{
-    "name": "Domain: Find all groups that contain keyword 'citrix'",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "Match (n:Group {domain:$result}) WHERE n.name CONTAINS \"CITRIX\" return n"
-    }]
-},{
-    "name": "Domain: Find all with network shares per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH (nodes {domain:$result}) where (any(prop in keys(nodes) where nodes[prop] contains '\\\\')) return nodes"
-    }]
-},{
-    "name": "Domain: Find all with network shares per domain, ignoring SYSVOL",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH (nodes {domain:$result}) where (any(prop in keys(nodes) where nodes[prop] contains '\\\\' and not nodes[prop] contains 'SYSVOL')) return nodes"
-    }]
-},{
-    "name": "Domain: Route user where group membership has dangerous rights over group per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH p=(u:User {enabled:true, domain: $result})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(g2:Group) RETURN p"
-    }]
-},{
-    "name": "Domain: Route user where group membership has dangerous rights over user per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-            "query": "MATCH p=(u1:User {enabled:true, domain: $result})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(u2:User) WHERE NOT u1<>u2 RETURN p"
-    }]
-},{
-    "name": "Domain: [DANGEROUS!!!] Route all enabled users Dangerous Rights to any node type, per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(u2:User {enabled:true, domain:$result})-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->nodes return p"
-    }]
-},{
-    "name": "Domain: [DANGEROUS!!!] Route all groups Dangerous Rights to any node type, per domain",
-    "category": "Domain",
-    "requireNodeSelect": true,
-    "queryList": [{
-        "final": false,
-        "title": "Select source domain",
-        "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
-    },{
-        "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS nodes MATCH p=(g2:Group {domain:$result})-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->nodes return p"
-    }]
-}]
+[
+    {
+      "name": "List high value target(s)",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (a {highvalue: true, domain: $result}) RETURN a",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List domain(s)",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH (d:Domain) RETURN d",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List domain trust(s)",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": true,
+          "query": "MATCH p=(n:Domain)-->(m:Domain) RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List enabled user(s)",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {enabled:true, domain: $result}) RETURN u"
+        }
+      ]
+    },
+    {
+      "name": "List enabled user(s) with an email address",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {enabled:true, domain: $result}) WHERE exists(u.email) RETURN u"
+        }
+      ]
+    },
+    {
+      "name": "List non-managed service account(s)",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {hasspn:true, domain: $result}) WHERE NOT u.name CONTAINS '$' AND NOT u.name CONTAINS 'KRBTGT' RETURN u"
+        }
+      ]
+    },
+    {
+      "name": "List enabled principal(s) with \"Unconstrained Delegation\"",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (a {unconstraineddelegation: true, enabled: true, domain: $result}) RETURN a",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List domain controller(s)",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (c:Computer {domain: $result})-[:MemberOf]->(g:Group) WHERE g.samaccountname CONTAINS 'Domain Controllers' RETURN c",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List Certificate Authority server(s) [Required: Certipy]",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:GPO {type:'Enrollment Service', domain: $result}) RETURN n"
+        }
+      ]
+    },
+    {
+      "name": "[WIP] List privileges for Certificate Authority server(s) [Required: Certipy]",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": false,
+          "title": "Select a Certificate Authority...",
+          "query": "MATCH (n:GPO {type:'Enrollment Service', domain: $result}) RETURN n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(g)-[:ManageCa|ManageCertificates|Auditor|Operator|Read|Enroll]->(n:GPO {name:$result}) return p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List all Certificate Template(s) [Required: Certipy]",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:GPO {type:'Certificate Template', domain: $result}) RETURN n"
+        }
+      ]
+    },
+    {
+      "name": "Find enabled Certificate Template(s) [Required: Certipy]",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:GPO {enabled:true, type:'Certificate Template', domain: $result}) RETURN n"
+        }
+      ]
+    },
+    {
+      "name": "[WIP] List all Enrollment Right(s) for Certificate Template(s)",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": false,
+          "title": "Select a Certificate Template...",
+          "query": "MATCH (n:GPO {type:'Certificate Template', domain: $result}) RETURN n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(g)-[:Enroll|AutoEnroll]->(n:GPO {name:$result, type:'Certificate Template'}) return p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List computer(s) WITHOUT LAPS",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (c:Computer {haslaps:false, domain: $result}) RETURN c ORDER BY c.name",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List network share(s), ignoring SYSVOL",
+      "category": "Domain / Macro",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (a {domain: $result}) WHERE (any(prop in keys(a) where a[prop] contains '\\\\' and not a[prop] contains 'SYSVOL')) RETURN a"
+        }
+      ]
+    },
+    {
+      "name": "List all group(s)",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "Match (g:Group {domain: $result}) RETURN g"
+        }
+      ]
+    },
+    {
+      "name": "List all GPO(s)",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "Match (g:GPO {domain: $result}) RETURN g"
+        }
+      ]
+    },
+    {
+      "name": "List all principal(s) with \"Local Admin\" permission",
+      "category": "Domain / Macro",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(a {domain: $result})-[:MemberOf|AdminTo*1..]->(c:Computer) RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List all principal(s) with \"RDP\" permission",
+      "category": "Domain / Macro",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(a {domain: $result})-[:MemberOf|CanRDP*1..]->(c:Computer) RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List all principal(s) with \"SQLAdmin\" permission",
+      "category": "Domain / Macro",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(a {domain: $result})-[:MemberOf|SQLAdmin*1..]->(c:Computer) RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List all user session(s) [Required: sessions]",
+      "category": "Domain / Macro",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {domain: $result})<-[r:HasSession]-(c:Computer) RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List all user(s) with description field",
+      "category": "Domain / Macro",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {domain: $result}) WHERE u.description IS NOT null return u"
+        }
+      ]
+    },
+    {
+      "name": "List all enabled user(s) with \"userpassword\" attribute",
+      "category": "Domain / Macro",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {enabled:true, domain: $result}) WHERE u.userpassword IS NOT null RETURN u"
+        }
+      ]
+    },
+    {
+      "name": "List all enabled user(s) with \"password never expires\" attribute",
+      "category": "Domain / Macro",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {pwdneverexpires:true, enabled:true, domain: $result}) return u"
+        }
+      ]
+    },
+    {
+      "name": "List all enabled user(s) with \"password never expires\" attribute and not changed in last year",
+      "category": "Domain / Macro",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {enabled:true, domain: $result}) WHERE u.pwdneverexpires=TRUE AND u.pwdlastset < (datetime().epochseconds - (365 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] return u"
+        }
+      ]
+    },
+    {
+      "name": "List all enabled user(s) with \"don't require passwords\" attribute",
+      "category": "Domain / Macro",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {passwordnotreqd:true, enabled:true, domain: $result}) return u"
+        }
+      ]
+    },
+    {
+      "name": "List all enabled user(s) but never logged in",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {enabled:true, domain: $result}) WHERE u.lastlogontimestamp=-1.0 RETURN u"
+        }
+      ]
+    },
+    {
+      "name": "List all enabled user(s) that logged in within the last 90 days",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {enabled:true, domain: $result}) WHERE u.lastlogon < (datetime().epochseconds - (90 * 86400)) and NOT u.lastlogon IN [-1.0, 0.0] RETURN u"
+        }
+      ]
+    },
+    {
+      "name": "List all enabled user(s) that set password within the last 90 days",
+      "category": "Domain / Macro",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {enabled:true, domain: $result}) WHERE u.pwdlastset < (datetime().epochseconds - (90 * 86400)) and NOT u.pwdlastset IN [-1.0, 0.0] RETURN u"
+        }
+      ]
+    }
+]

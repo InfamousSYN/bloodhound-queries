@@ -1,0 +1,34 @@
+[
+    {
+      "name":"Find allshortestpaths with dangerous rights to AdminSDHolder object",
+      "category": "Persistence",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((u:User {enabled:true, admincount:false, domain: $result})-[*]->(c:Container)) WHERE c.distinguishedname CONTAINS 'ADMINSDHOLDER' RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name":"Find allshortestpaths with DCSync to domain object",
+      "category": "Persistence",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((u:User {enabled:true, admincount:false, domain: $result})-[r:MemberOf|DCSync*1..]->(:Domain)) RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    }
+]

@@ -1,0 +1,316 @@
+[
+    {
+      "name":"Find all enabled AS-REP roastable user(s)",
+      "category": "Privilege Escalation / Lateral Movement",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {dontreqpreauth: true, enabled:true, domain: $result}) WHERE NOT u.name CONTAINS '$' and NOT u.name CONTAINS 'KRBTGT' RETURN u",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name":"Find all enabled kerberoastable user(s)",
+      "category": "Privilege Escalation / Lateral Movement",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {hasspn: true, enabled:true, domain: $result}) WHERE NOT u.name CONTAINS '$' and NOT u.name CONTAINS 'KRBTGT' RETURN u",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged user(s) with dangerous rights to user(s) [HIGH RAM]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((u:User {enabled: true, admincount: false, domain: $result})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a:User)) WHERE NOT u = a RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged user(s) with dangerous rights to group(s) [HIGH RAM]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((u:User {enabled: true, admincount: false, domain: $result})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a:Group)) WHERE NOT u = a RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged user(s) with dangerous rights to computer(s) [HIGH RAM]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((u:User {enabled: true, admincount: false, domain: $result})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a:Computer)) WHERE NOT u = a RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged user(s) with dangerous rights to GPO(s) [HIGH RAM]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((u:User {enabled: true, admincount: false, domain: $result})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a:GPO)) WHERE NOT u = a RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged user(s) with dangerous rights to privileged node(s) [HIGH RAM]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((u:User {enabled: true, admincount: false, domain: $result})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a {admincount: true})) WHERE NOT u = a RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged computer(s) with dangerous rights to user(s) [HIGH RAM]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((c:Computer {admincount: false})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a:User {domain: $result})) WHERE NOT c = a RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged computer(s) with dangerous rights to group(s) [HIGH RAM]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((c:Computer {admincount: false})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a:Group {domain: $result})) WHERE NOT c = a RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged computer(s) with dangerous rights to computer(s) [HIGH RAM]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((c:Computer {admincount: false})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a:Computer {domain: $result})) WHERE NOT c = a RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged computer(s) with dangerous rights to GPO(s) [HIGH RAM]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((c:Computer {admincount: false})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a:GPO {domain: $result})) WHERE NOT c = a RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Route non-privileged computer(s) with dangerous rights to privileged node(s) [HIGH RAM]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((c:Computer {admincount: false})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a {admincount: true, domain: $result})) WHERE NOT c = a RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List ESC1 vulnerable Certificate Template(s) [Required: Certipy]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:GPO {Enabled:true, type:'Certificate Template', `Enrollee Supplies Subject`:true, `Client Authentication`:true, domain: $result}) RETURN n"
+        }
+      ]
+    },
+    {
+      "name": "List ESC2 vulnerable Certificate Template(s) [Required: Certipy]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:GPO {Enabled:true, type:'Certificate Template', domain: $result}) WHERE (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage`) RETURN n"
+        }
+      ]
+    },
+    {
+      "name": "List ESC3 vulnerable Certificate Template(s) [Required: Certipy]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:GPO {Enabled:true, type:'Certificate Template', domain: $result}) WHERE (n.`Extended Key Usage` = [] or 'Any Purpose' IN n.`Extended Key Usage` or 'Certificate Request Agent' IN n.`Extended Key Usage`) RETURN n"
+        }
+      ]
+    },
+    {
+      "name": "List ESC4 vulnerable Certificate Template(s) [Required: Certipy]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=shortestPath((g)-[:GenericAll|GenericWrite|Owns|WriteDacl|WriteOwner*1..]->(n:GPO {Enabled:true, type:'Certificate Template', domain: $result})) WHERE g<>n RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List ESC6 vulnerable Certificate Template(s) [Required: Certipy]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:GPO {type:'Enrollment Service', `User Specified SAN`:'Enabled', domain: $result}) RETURN n"
+        }
+      ]
+    },
+    {
+      "name": "List ESC7 vulnerable Certificate Template(s) [Required: Certipy]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=shortestPath((g)-[r:GenericAll|GenericWrite|Owns|WriteDacl|WriteOwner|ManageCa|ManageCertificates*1..]->(n:GPO {type:'Enrollment Service', domain: $result})) WHERE  g<>n RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List ESC8 vulnerable Certificate Template(s) [Required: Certipy]",
+      "category": "Privilege Escalation / Lateral Movement",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (n:GPO {type:'Enrollment Service', `Web Enrollment`:'Enabled', domain: $result}) RETURN n"
+        }
+      ]
+    },
+    {
+      "name": "List all cross-domain user session(s) and user group membership(s)",
+      "category": "Privilege Escalation / Lateral Movement",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain...",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(g1:Group)<-[:MemberOf*1..]-(u:User {enabled:true, domain: $result})<-[:HasSession]-(c:Computer) WHERE NOT u.domain = c.domain RETURN p ORDER BY c.name",
+          "allowCollapse": false
+        }
+      ]
+    }
+]

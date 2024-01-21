@@ -1,148 +1,331 @@
-[{
-    "name": "Owned: List all users",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (u:User {owned:true}) RETURN u"
-        }]
-},{
-    "name": "Owned: List all enabled users",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (u:User {owned:true, enabled:true}) RETURN u"
-        }]
-},{
-    "name": "Owned: List all enabled users with an email address",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (u:User {owned:true, enabled:true}) WHERE exists(u.email) RETURN u"
-        }]
-},{
-    "name": "Owned: List all owned user group membership",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) RETURN p"
-    }]
-},{
-    "name": "Owned: List all enabled users not members of privileged groups",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE (NOT g.objectid ENDS WITH ['$domain_admins', '$enterprise_admins', '$administrators', '$account_operators']) RETURN p",
-        "props": {
-            "domain_admins": "-512",
-            "enterprise_admins": "-519",
-            "administrators": "-544",
-            "account_operators": "-548"
+[
+    {
+      "name": "List all owned user(s)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {owned:true, domain: $result}) RETURN u"
         }
-        }]
-},{
-    "name": "Owned: List all enabled users members of privileged groups",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group) WHERE (g.objectid ENDS WITH ['$domain_admins', '$enterprise_admins', '$administrators', '$account_operators']) RETURN p",
-        "props": {
-            "domain_admins": "-512",
-            "enterprise_admins": "-519",
-            "administrators": "-544",
-            "account_operators": "-548"
+      ]
+    },
+    {
+      "name": "List all owned & enabled user(s)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {owned:true, enabled:true, domain: $result}) RETURN u"
         }
-        }]
-},{
-    "name": "Owned: List all enabled users that can RDP",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true, enabled:true})-[r:CanRDP]->(c:Computer) RETURN p"
-    }]
-},{
-    "name": "Owned: [NT] List all computers",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (c:Computer {owned:true}) RETURN c ORDER BY c.name"
-    }]
-},{
-    "name": "Owned: [DANGEROUS!!!] Route all enabled owned Dangerous Rights to any node type",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
-    }]
-},{
-    "name": "Owned: [DANGEROUS!!!] Route all enabled owned where group membership grants Dangerous Rights to any node type",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH (c:Computer), (u1:User), (g:Group), (gp:GPO), (co:Container), (ou:OU) WITH collect([c, u1, g, gp, co, ou]) AS t WITH t AS results UNWIND results AS results_2 UNWIND results_2 AS result MATCH p=(u2:User {owned:true})-[:MemberOf*1..]->(g2:Group)-[r:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo]->(result) RETURN p"
-    }]
-},{
-    "name": "Owned: Route all enabled owned where group membership grants Dangerous Rights to group",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-            "query": "MATCH p=(u:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(g2:Group) RETURN p ORDER BY g1.name"
-    }]
-},{
-    "name": "Owned: Route all enabled owned where group membership grants Dangerous Rights to user",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-            "query": "MATCH p=(u1:User {owned:true, enabled:true})-[:MemberOf*1..]->(g1:Group)-[r:Owns|WriteDacl|GenericAll|GenericWrite|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword|AdminTo]->(u2:User) RETURN p ORDER BY g1.name"
-    }]
-},{
-    "name": "Owned: Route from owned user to all nodes with 'Unconstrained Delegation'",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,                
-        "query": "MATCH p=(o {unconstraineddelegation: true, enabled: true})<-[r]-(u:User {owned:true, enabled:true}) RETURN p",
-        "allowCollapse": false
-    }]
-},{
-    "name": "Owned: Find all owned user with privileged access to Azure Tenancy (Required: azurehound)",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(n {owned:true, enabled:true})-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(:AZTenant) RETURN p"
-    }]
-},{
-    "name": "Owned: Find all owned user where group membership grants privileged access to Azure Tenancy (Required: azurehound)",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(n {owned:true, enabled:true})-[:MemberOf*1..]->(g:Group)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(:AZTenant) RETURN p"
-    }]
-},{
-    "name": "Owned: Find all Owners of Azure Applications with Owners to Service Principals with Dangerous Rights (Required: azurehound)",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p = (n {enabled:true, owned:true})-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
-        "allowCollapse": true
-    }]
-},{
-    "name": "Owned: Find all owned groups that grant access to network shares",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true})-[:MemberOf*1..]->(g:Group) where (any(prop in keys(g) where g[prop] contains '\\\\')) return p"
-    }]
-},{
-    "name": "Owned: Route all sessions to computers WITHOUT LAPS (Required: sessions)",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true})<-[r:HasSession]-(c:Computer {haslaps:false}) RETURN p ORDER BY c.name"
-    }]
-},{
-    "name": "Owned: Route all sessions to computers (Required: sessions)",
-    "category": "Owned",
-    "queryList": [{
-        "final": true,
-        "query": "MATCH p=(u:User {owned:true})<-[r:HasSession]-(c:Computer) RETURN p ORDER BY c.name"
-    }]
-}]
+      ]
+    },
+    {
+      "name": "List all owned & enabled user(s) with an email address",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (u:User {owned:true, enabled:true, domain: $result}) WHERE exists(u.email) RETURN u"
+        }
+      ]
+    },
+    {
+      "name": "List all owned & enabled user(s) with \"Local Admin\" permission, and any active sessions and their group membership(s)",
+      "category": "Owned",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {owned:true, enabled: true, domain: $result})-[:MemberOf|AdminTo*1..]->(c:Computer) OPTIONAL MATCH p2=(c)-[:HasSession]->(u2:User) OPTIONAL MATCH p3=(u2:User)-[:MemberOf*1..]->(:Group) RETURN p, p2, p3",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List all owned & enabled user(s) with \"RDP\" permission, and any active sessions and their group membership(s)",
+      "category": "Owned",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {owned:true, enabled: true, domain: $result})-[:MemberOf|CanRDP*1..]->(c:Computer) OPTIONAL MATCH p2=(c)-[:HasSession]->(u2:User) OPTIONAL MATCH p3=(u2:User)-[:MemberOf*1..]->(:Group) RETURN p, p2, p3",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "List all owned & enabled user(s) with \"SQLAdmin\" permission",
+      "category": "Owned",
+      "requireNodeSelect": true,
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {owned:true, enabled: true, domain: $result})-[:MemberOf|SQLAdmin*1..]->(c:Computer) RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "List all owned computer(s)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH (c:Computer {owned:true, domain: $result}) RETURN c ORDER BY c.name"
+        }
+      ]
+    },
+    {
+      "name": "Route all owned & enabled group membership(s)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {owned:true, enabled:true, domain: $result})-[:MemberOf*1..]->(g:Group) RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "Route all owned & enabled non-privileged group(s) membership",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {owned:true, enabled:true, domain: $result})-[:MemberOf*1..]->(g:Group {admincount:false}) RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "Route all owned & enabled privileged group(s) membership",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {owned:true, enabled:true, domain: $result})-[:MemberOf*1..]->(g:Group {admincount:true}) RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "Route all owned & enabled user(s) with Dangerous Rights to any node type",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((u:User {owned:true, enabled:true, domain: $result})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(a)) WHERE NOT a = u RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "Route all owned & enabled user(s) with Dangerous Rights to group(s)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((u:User {owned:true, enabled:true, domain: $result})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(:Group))RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "Route all owned & enabled user(s) with Dangerous Rights to user(s)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((o:User {owned:true, enabled:true, domain: $result})-[:MemberOf|Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|AllowedToDelegate|ForceChangePassword|AdminTo*1..]->(u:User)) WHERE NOT o = u RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "Route from owned & enabled user(s) to all principals with \"Unconstrained Delegation\"",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((o:User {owned:true, enabled:true, domain: $result})-[*]->(a {unconstraineddelegation: true, enabled: true})) WHERE NOT o = a RETURN p",
+          "allowCollapse": false
+        }
+      ]
+    },
+    {
+      "name": "Route from owned & enabled principals to high value target(s)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allShortestPaths((o {owned:true, enabled:true, domain: $result})-[*]->(a {highvalue: true})) WHERE NOT o=a RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "Owned: [WIP] Find all owned user with privileged access to Azure Tenancy (Required: azurehound)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(n {owned:true, enabled:true, domain: $result})-[r:MemberOf|AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(:AZTenant) RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Owned: [WIP] Find all owned user where group membership grants privileged access to Azure Tenancy (Required: azurehound)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(n {owned:true, enabled:true, domain: $result})-[:MemberOf*1..]->(g:Group)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(:AZTenant) RETURN p"
+        }
+      ]
+    },
+    {
+      "name": "Owned: [WIP] Find all Owners of Azure Applications with Owners to Service Principals with Dangerous Rights (Required: azurehound)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p = (n {enabled:true, owned:true, domain: $result})-[:AZOwns]->(azapp:AZApp)-[r1]->(azsp:AZServicePrincipal)-[r:AZGlobalAdmin|AZPrivilegedRoleAdmin*1..]->(azt:AZTenant) RETURN p",
+          "allowCollapse": true
+        }
+      ]
+    },
+    {
+      "name": "Find all owned groups that grant access to network shares",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {owned:true, domain: $result})-[:MemberOf*1..]->(g:Group) where (any(prop in keys(g) where g[prop] contains '\\\\')) return p"
+        }
+      ]
+    },
+    {
+      "name": "Route all sessions to computers WITHOUT LAPS (Required: sessions)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {owned:true, domain: $result})<-[r:HasSession]-(c:Computer {haslaps:false}) RETURN p ORDER BY c.name"
+        }
+      ]
+    },
+    {
+      "name": "Route all sessions to computers (Required: sessions)",
+      "category": "Owned",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=(u:User {owned:true, domain: $result})<-[r:HasSession]-(c:Computer) RETURN p ORDER BY c.name"
+        }
+      ]
+    }
+]
