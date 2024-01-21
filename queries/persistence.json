@@ -30,5 +30,21 @@
           "allowCollapse": false
         }
       ]
+    },
+    {
+      "name":"Find allshortestpaths with Shadow Credential permission to principal(s)",
+      "category": "Persistence",
+      "queryList": [
+        {
+          "final": false,
+          "title": "Select source domain",
+          "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name"
+        },
+        {
+          "final": true,
+          "query": "MATCH p=allshortestpaths((a {domain: $result})-[:MemberOf|AddKeyCredentialLink*1..]->(b)) WHERE NOT a=b RETURN p",
+          "allowCollapse": false
+        }
+      ]
     }
 ]

@@ -21,7 +21,7 @@ c:\>(wget https://github.com/InfamousSYN/bloodhound-queries/raw/main/customqueri
 
 ## Query List
 
-Query count: 101
+Query count: 102
 
 
 ```
@@ -116,6 +116,7 @@ Privileged: List all enabled SVC account(s) with privileged group membership(s)
 Privileged: Route all privileged user(s) with sessions to non-privileged computer(s) [Required: sessions]
 Persistence: Find allshortestpaths with dangerous rights to AdminSDHolder object
 Persistence: Find allshortestpaths with DCSync to domain object
+Persistence: Find allshortestpaths with Shadow Credential permission to principal(s)
 AAD: List all Tenancy (Required: azurehound)
 AAD: [WIP] List all AAD Group(s) that are synchronized with AD (Required: azurehound)
 AAD: [WIP] List all principal(s) used for syncing AD and AAD
